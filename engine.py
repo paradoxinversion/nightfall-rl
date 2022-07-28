@@ -3,7 +3,6 @@ from typing import Set, Iterable, Any
 from tcod.context import Context
 from tcod.console import Console
 
-from actions import EscapeAction, MovementAction
 from entity import Entity
 from game_map import GameMap
 from input_handlers import EventHandler
@@ -14,7 +13,6 @@ class Engine:
         self.entities = entities
         self.event_handler = event_handler
         self.game_map = game_map
-
         self.player = player
 
     def handle_events(self, events: Iterable[Any]) -> None:
@@ -23,13 +21,8 @@ class Engine:
 
             if action is None:
                 continue
-
-            if isinstance(action, MovementAction):
-                if self.game_map.tiles["walkable"][self.player.x + action.dx, self.player.y + action.dy]:
-                    self.player.move(dx=action.dx, dy=action.dy)
-
-            elif isinstance(action, EscapeAction):
-                raise SystemExit()
+            
+            action.perform(self, self.player)
 
     def render(self, console: Console, context: Context) -> None:
         self.game_map.render(console)
