@@ -1,8 +1,6 @@
 from __future__ import annotations
 import os
-
 from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
-
 import tcod
 import actions
 
@@ -12,11 +10,14 @@ from actions import (
     PickupAction,
     WaitAction
 )
+
 import color
 import exceptions
+
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Item
+
 MOVE_KEYS = {
     # Arrow keys.
     tcod.event.K_UP: (0, -1),
@@ -52,10 +53,12 @@ WAIT_KEYS = {
     tcod.event.K_KP_5,
     tcod.event.K_CLEAR,
 }
+
 CONFIRM_KEYS = {
     tcod.event.K_RETURN,
     tcod.event.K_KP_ENTER,
 }
+
 ActionOrHandler = Union[Action, "BaseEventHandler"]
 """An event handler return value which can trigger an action or switch active handlers.
 
@@ -63,7 +66,6 @@ If a handler is returned then it will become the active handler for future event
 If an action is returned it will be attempted and if it's valid then
 MainGameEventHandler will become the active handler.
 """
-
 
 class BaseEventHandler(tcod.event.EventDispatch[ActionOrHandler]):
     def handle_events(self, event: tcod.event.Event) -> BaseEventHandler:
@@ -149,6 +151,7 @@ class EventHandler(BaseEventHandler):
 
     def on_render(self, console: tcod.Console) -> None:
         self.engine.render(console)
+
 class AskUserEventHandler(EventHandler):
     """Handles user input for actions which require special input."""
 
@@ -232,13 +235,13 @@ class SelectIndexHandler(AskUserEventHandler):
         """Called when an index is selected."""
         raise NotImplementedError()
 
-
 class LookHandler(SelectIndexHandler):
     """Lets the player look around using the keyboard."""
 
     def on_index_selected(self, x: int, y: int) -> MainGameEventHandler:
         """Return to main handler."""
         return MainGameEventHandler(self.engine)
+
 class SingleRangedAttackHandler(SelectIndexHandler):
     """Handles targeting a single enemy. Only the enemy selected will be affected."""
 
@@ -286,7 +289,6 @@ class AreaRangedAttackHandler(SelectIndexHandler):
         return self.callback((x, y))
 
 class MainGameEventHandler(EventHandler):
-
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         action: Optional[Action] = None
 
@@ -508,6 +510,7 @@ class LevelUpEventHandler(AskUserEventHandler):
         Don't allow the player to click to exit the menu, like normal.
         """
         return None
+
 class InventoryEventHandler(AskUserEventHandler):
     """This handler lets the user select an item.
 
@@ -594,7 +597,6 @@ class InventoryActivateHandler(InventoryEventHandler):
             return actions.EquipAction(self.engine.player, item)
         else:
             return None
-
 
 class InventoryDropHandler(InventoryEventHandler):
     """Handle dropping an inventory item."""
