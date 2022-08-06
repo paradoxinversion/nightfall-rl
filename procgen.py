@@ -20,6 +20,7 @@ max_monsters_by_floor = [
     (4, 3),
     (6, 5),
 ]
+
 item_chances: Dict[int, List[Tuple[Entity, int]]] = {
     0: [(entity_factories.health_potion, 35)],
     2: [(entity_factories.confusion_scroll, 10)],
@@ -33,6 +34,7 @@ enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
     5: [(entity_factories.troll, 30)],
     7: [(entity_factories.troll, 60)],
 }
+
 def get_max_value_for_floor(
     max_value_by_floor: List[Tuple[int, int]], floor: int
 ) -> int:
@@ -71,7 +73,6 @@ def get_entities_at_random(
     )
 
     return chosen_entities
-
 
 class RectangularRoom:
     def __init__(self, x: int, y: int, width: int, height: int):
@@ -139,7 +140,6 @@ def tunnel_between(
       yield x, y
   for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)).tolist():
       yield x, y
-
 
 def generate_dungeon(
    max_rooms: int,
