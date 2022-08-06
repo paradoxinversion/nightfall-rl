@@ -1,11 +1,8 @@
 from __future__ import annotations
-
 from typing import Optional, TYPE_CHECKING
-
 import actions
 import color
 import components.ai
-
 import components.inventory
 from components.base_component import BaseComponent
 from exceptions import Impossible
@@ -14,9 +11,9 @@ from input_handlers import (
     AreaRangedAttackHandler,
     SingleRangedAttackHandler,
 )
+
 if TYPE_CHECKING:
     from entity import Actor, Item
-
 
 class Consumable(BaseComponent):
     parent: Item
@@ -37,6 +34,7 @@ class Consumable(BaseComponent):
         inventory = entity.parent
         if isinstance(inventory, components.inventory.Inventory):
             inventory.items.remove(entity)
+
 class ConfusionConsumable(Consumable):
     def __init__(self, number_of_turns: int):
         self.number_of_turns = number_of_turns
@@ -69,6 +67,7 @@ class ConfusionConsumable(Consumable):
             entity=target, previous_ai=target.ai, turns_remaining=self.number_of_turns,
         )
         self.consume()
+
 class HealingConsumable(Consumable):
     def __init__(self, amount: int):
         self.amount = amount
@@ -112,6 +111,7 @@ class LightningDamageConsumable(Consumable):
             self.consume()
         else:
             raise Impossible("No enemy is close enough to strike.")
+            
 class FireballDamageConsumable(Consumable):
     def __init__(self, damage: int, radius: int):
         self.damage = damage
