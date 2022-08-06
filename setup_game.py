@@ -40,7 +40,7 @@ def new_game() -> Engine:
     engine.update_fov()
 
     engine.message_log.add_message(
-        "Hello and welcome, adventurer, to yet another dungeon!", color.welcome_text
+        "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
     dagger = copy.deepcopy(entity_factories.dagger)
     leather_armor = copy.deepcopy(entity_factories.leather_armor)
@@ -73,14 +73,14 @@ class MainMenu(input_handlers.BaseEventHandler):
         console.print(
             console.width // 2,
             console.height // 2 - 4,
-            "TOMBS OF THE ANCIENT KINGS",
+            "Nightfall",
             fg=color.menu_title,
             alignment=tcod.CENTER,
         )
         console.print(
             console.width // 2,
             console.height - 2,
-            "By (Your name here)",
+            "By Jedai Saboteur",
             fg=color.menu_title,
             alignment=tcod.CENTER,
         )
