@@ -1,5 +1,5 @@
 from components.ai import HostileEnemy
-from components import consumable, equippablefrom components.fighter
+from components import consumable, equippable
 from components.equipment import Equipment
 from components.fighter import Fighter
 from components.inventory import Inventory
