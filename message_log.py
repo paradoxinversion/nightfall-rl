@@ -1,10 +1,7 @@
 from typing import Iterable, List, Reversible, Tuple
 import textwrap
-
 import tcod
-
 import color
-
 
 class Message:
     def __init__(self, text: str, fg: Tuple[int, int, int]):
@@ -18,7 +15,6 @@ class Message:
         if self.count > 1:
             return f"{self.plain_text} (x{self.count})"
         return self.plain_text
-
 
 class MessageLog:
     def __init__(self) -> None:
@@ -45,6 +41,7 @@ class MessageLog:
         the `console`.
         """
         self.render_messages(console, x, y, width, height, self.messages)
+
     @staticmethod
     def wrap(string: str, width: int) -> Iterable[str]:
         """Return a wrapped text message."""
@@ -52,6 +49,7 @@ class MessageLog:
             yield from textwrap.wrap(
                 line, width, expand_tabs=True,
             )
+            
     @classmethod
     def render_messages(
         cls,
