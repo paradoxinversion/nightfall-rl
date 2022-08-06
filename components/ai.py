@@ -1,10 +1,8 @@
 from __future__ import annotations
 import random
-
 from typing import Callable, Optional, Tuple, TYPE_CHECKING
 import numpy as np  # type: ignore
 import tcod
-
 from actions import Action, BumpAction, MeleeAction, MovementAction, WaitAction
 
 if TYPE_CHECKING:
@@ -42,6 +40,7 @@ class BaseAI(Action):
 
         # Convert from List[List[int]] to List[Tuple[int, int]].
         return [(index[0], index[1]) for index in path]
+
 class ConfusedEnemy(BaseAI):
     """
     A confused enemy will stumble around aimlessly for a given number of turns, then revert back to its previous AI.
@@ -83,6 +82,7 @@ class ConfusedEnemy(BaseAI):
             # The actor will either try to move or attack in the chosen random direction.
             # Its possible the actor will just bump into the wall, wasting a turn.
             return BumpAction(self.entity, direction_x, direction_y,).perform()
+
 class HostileEnemy(BaseAI):
     def __init__(self, entity: Actor):
         super().__init__(entity)
