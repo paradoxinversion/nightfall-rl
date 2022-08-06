@@ -24,6 +24,7 @@ class Action:
         This method must be overridden by Action subclasses.
         """
         raise NotImplementedError()
+
 class PickupAction(Action):
     """Pickup an item and add it to the inventory, if there is room for it."""
 
@@ -68,6 +69,7 @@ class ItemAction(Action):
         """Invoke the items ability, this action will be given to provide context."""
         if self.item.consumable:
             self.item.consumable.activate(self)
+
 class DropItem(ItemAction):
     def perform(self) -> None:
         if self.entity.equipment.item_is_equipped(self.item):
@@ -100,6 +102,7 @@ class TakeStairsAction(Action):
             )
         else:
             raise exceptions.Impossible("There are no stairs here.")
+
 class ActionWithDirection(Action):
     def __init__(self, entity: Actor, dx: int, dy: int):
         super().__init__(entity)
@@ -121,6 +124,7 @@ class ActionWithDirection(Action):
         return self.engine.game_map.get_actor_at_location(*self.dest_xy)
     def perform(self) -> None:
         raise NotImplementedError()
+        
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
         target = self.target_actor
