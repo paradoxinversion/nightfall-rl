@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 import color
 from components.base_component import BaseComponent
@@ -7,6 +6,7 @@ from render_order import RenderOrder
 
 if TYPE_CHECKING:
     from entity import Actor
+
 class Fighter(BaseComponent):
     parent: Actor
     def __init__(self, hp: int, base_defense: int, base_power: int):
@@ -24,6 +24,7 @@ class Fighter(BaseComponent):
         self._hp = max(0, min(value, self.max_hp))
         if self._hp == 0 and self.parent.ai:
             self.die()
+
     @property
     def defense(self) -> int:
         return self.base_defense + self.defense_bonus
@@ -45,6 +46,7 @@ class Fighter(BaseComponent):
             return self.parent.equipment.power_bonus
         else:
             return 0
+
     def die(self) -> None:
         if self.engine.player is self.parent:
             death_message = "You died!"
@@ -60,6 +62,7 @@ class Fighter(BaseComponent):
         self.parent.render_order = RenderOrder.CORPSE
         self.engine.message_log.add_message(death_message, death_message_color)
         self.engine.player.level.add_xp(self.parent.level.xp_given)
+
     def heal(self, amount: int) -> int:
         if self.hp == self.max_hp:
             return 0
@@ -70,9 +73,7 @@ class Fighter(BaseComponent):
             new_hp_value = self.max_hp
 
         amount_recovered = new_hp_value - self.hp
-
         self.hp = new_hp_value
-
         return amount_recovered
 
     def take_damage(self, amount: int) -> None:
