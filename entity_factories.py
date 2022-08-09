@@ -1,9 +1,10 @@
 from components.ai import HostileEnemy
-from components import consumable, equippable, body
+from components import consumable, equippable
 from components.equipment import Equipment
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
+from components.body import Body
 from entity import Actor, Item
 
 player = Actor(
@@ -15,6 +16,7 @@ player = Actor(
     fighter=Fighter(hp=30, base_defense=1, base_power=2),
     inventory=Inventory(capacity=26),
     level=Level(level_up_base=200),
+    body=Body(race="human")
 )
 
 orc = Actor(
@@ -26,6 +28,7 @@ orc = Actor(
     fighter=Fighter(hp=10, base_defense=0, base_power=3),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=35),
+    body=Body(race="orc")
 )
 
 troll = Actor(
@@ -37,6 +40,7 @@ troll = Actor(
     fighter=Fighter(hp=16, base_defense=1, base_power=4),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=100),
+    body=Body(race="troll")
 )
 
 confusion_scroll = Item(

@@ -25,7 +25,6 @@ def new_game() -> Engine:
     max_rooms = 30
 
     player = copy.deepcopy(entity_factories.player)
-
     engine = Engine(player=player)
 
     engine.game_world = GameWorld(
@@ -42,6 +41,7 @@ def new_game() -> Engine:
     engine.message_log.add_message(
         "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
+    player.parent = engine.game_map
     dagger = copy.deepcopy(entity_factories.dagger)
     leather_armor = copy.deepcopy(entity_factories.leather_armor)
 

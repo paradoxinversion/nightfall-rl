@@ -442,7 +442,15 @@ class CharacterScreenEventHandler(AskUserEventHandler):
         console.print(
             x=x + 1, y=y + 5, string=f"Defense: {self.engine.player.fighter.defense}"
         )
-
+        total_hp = 0
+        for part in self.engine.player.body.body_parts.values():
+            total_hp += part.hp
+        console.print(
+            x=x + 1, y=y + 6, string=f"Body: {self.engine.player.body.current_hp}/{self.engine.player.body.total_hp}"
+        )
+        console.print(
+            x=x + 1, y=y + 7, string=f"Head: {self.engine.player.body.body_parts.get('head').hp}"
+        )
 class LevelUpEventHandler(AskUserEventHandler):
     TITLE = "Level Up"
 
