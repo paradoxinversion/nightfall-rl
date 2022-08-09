@@ -57,7 +57,7 @@ body_template_humanoid = {
     "left_arm": BodyPart("Left Arm", 10),
     "right_arm": BodyPart("Right Arm", 10),
     "left_leg": BodyPart("Left Leg", 15),
-    "right_arm": BodyPart("Rigt Leg", 15),
+    "right_leg": BodyPart("Rigt Leg", 15),
 }
 class Body(BaseComponent):
     """A body def for a coporeal or incorporeal entity """

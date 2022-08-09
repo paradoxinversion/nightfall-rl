@@ -451,6 +451,26 @@ class CharacterScreenEventHandler(AskUserEventHandler):
         console.print(
             x=x + 1, y=y + 7, string=f"Head: {self.engine.player.body.body_parts.get('head').hp}"
         )
+
+        console.print(
+            x=x + 1, y=y + 8, string=f"Torso: {self.engine.player.body.body_parts.get('torso').hp}"
+        )
+
+        console.print(
+            x=x + 1, y=y + 9, string=f"Right Arm: {self.engine.player.body.body_parts.get('right_arm').hp}"
+        )
+
+        console.print(
+            x=x + 1, y=y + 10, string=f"Left Arm: {self.engine.player.body.body_parts.get('left_arm').hp}"
+        )
+
+        console.print(
+            x=x + 1, y=y + 11, string=f"Right Leg: {self.engine.player.body.body_parts.get('right_leg').hp}"
+        )
+
+        console.print(
+            x=x + 1, y=y + 12, string=f"Left Leg: {self.engine.player.body.body_parts.get('left_leg').hp}"
+        )
 class LevelUpEventHandler(AskUserEventHandler):
     TITLE = "Level Up"
 
