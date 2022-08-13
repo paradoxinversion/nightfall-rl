@@ -11,6 +11,7 @@ from engine import Engine
 import entity_factories
 from game_map import GameWorld
 import input_handlers
+from time_cycles import TimeCycle
 
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
@@ -25,7 +26,9 @@ def new_game() -> Engine:
     max_rooms = 30
 
     player = copy.deepcopy(entity_factories.player)
-    engine = Engine(player=player)
+    time_cycle = TimeCycle(10, 1)
+
+    engine = Engine(player=player, time_cycle=time_cycle)
 
     engine.game_world = GameWorld(
         engine=engine,
@@ -34,6 +37,7 @@ def new_game() -> Engine:
         room_max_size=room_max_size,
         map_width=map_width,
         map_height=map_height,
+        
     )
     engine.game_world.generate_floor()
     engine.update_fov()

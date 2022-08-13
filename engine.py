@@ -6,6 +6,7 @@ from tcod.console import Console
 from tcod.map import compute_fov
 import exceptions
 from message_log import MessageLog
+from time_cycles import TimeCycle
 import render_functions
 
 if TYPE_CHECKING:
@@ -15,11 +16,13 @@ if TYPE_CHECKING:
 class Engine:
     game_map: GameMap
     game_world: GameWorld
+    time_cycle: TimeCycle
 
-    def __init__(self, player: Actor):
+    def __init__(self, player: Actor, time_cycle: TimeCycle):
         self.message_log = MessageLog()
         self.mouse_location = (0, 0)
         self.player = player
+        self.time_cycle = time_cycle
 
     def save_as(self, filename: str) -> None:
         """Save this Engine instance as a compressed file."""
