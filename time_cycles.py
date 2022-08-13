@@ -7,6 +7,7 @@ class TimeCycle():
         self._phase_transition_period = phase_transition_period
         self._phase_in_transition = False
         self._remaining_phase_transition_ticks = 0
+
     @property
     def units_in_day(self):
         return self._units_in_day
@@ -40,3 +41,8 @@ class TimeCycle():
         self._phase_in_transition = in_transition
         if in_transition == True:
             self._remaining_phase_transition_ticks = self._phase_transition_period
+    
+    def return_phase(self):
+        if self._tick_day <= self.units_in_day / 2:
+            return "Day"
+        return "Night"

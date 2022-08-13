@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 
 def get_names_at_location(x: int, y: int, game_map: GameMap) -> str:
+    """Return the names of the entities at x and y in the game_map"""
     if not game_map.in_bounds(x, y) or not game_map.visible[x, y]:
         return ""
 
@@ -21,6 +22,7 @@ def get_names_at_location(x: int, y: int, game_map: GameMap) -> str:
 def render_bar(
     console: Console, current_value: int, maximum_value: int, total_width: int
 ) -> None:
+    """Render a bar such as for HP or MP"""
     bar_width = int(float(current_value) / maximum_value * total_width)
 
     console.draw_rect(x=0, y=45, width=total_width, height=1, ch=1, bg=color.bar_empty)
@@ -47,6 +49,7 @@ def render_dungeon_level(
 def render_names_at_mouse_location(
     console: Console, x: int, y: int, engine: Engine
 ) -> None:
+    """Render the names of entities beneath the mouse location"""
     mouse_x, mouse_y = engine.mouse_location
 
     names_at_mouse_location = get_names_at_location(
@@ -54,3 +57,11 @@ def render_names_at_mouse_location(
     )
 
     console.print(x=x, y=y, string=names_at_mouse_location)
+
+def render_time_cycles(
+    console: Console, x: int, y: int, engine: Engine
+):
+    """Renders time cycles"""
+    widget_width = 10
+    console.print(x=x, y=y, string=f"{engine.time_cycle.tick_day}")
+    console.print(x=x, y=y+1, string=f"{engine.time_cycle.return_phase()}")

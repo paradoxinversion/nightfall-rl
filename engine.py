@@ -66,4 +66,8 @@ class Engine:
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=44, engine=self
         )
+
+        render_functions.render_time_cycles(
+            console=console, x=10, y=5, engine=self
+        )
         
