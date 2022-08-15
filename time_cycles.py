@@ -4,6 +4,9 @@ class TimeCycle():
         self._tick_global = 0
         self._tick_day = 0
 
+        self._current_phase = 0 # phases: 0 - dawn, 1 - day, 2 - dusk, 3 - night
+        self._ticks_phase_dawn, self._ticks_phase_dusk = phase_transition_period
+        self._ticks_phase_daytime, self._ticks_phase_nighttime = (units_in_day / 2) - phase_transition_period
         self._phase_transition_period = phase_transition_period
         self._phase_in_transition = False
         self._remaining_phase_transition_ticks = 0
@@ -20,11 +23,18 @@ class TimeCycle():
     def tick_day(self):
         return self._tick_day
 
+    @property
+    def set_phase_transition_ticks(self):
+        pass
+        
+
     def tick(self):
-        # Increment the daily and global tcik
+        # Increment the daily and global tick
         self._tick_day += 1
         self._tick_global += 1
 
+        # handle phase stuff
+        
         if self._phase_in_transition:
             self._remaining_phase_transition_ticks -= 1
 
