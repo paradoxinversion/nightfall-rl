@@ -89,7 +89,8 @@ class Actor(Entity):
         fighter: Fighter,
         inventory: Inventory,
         level: Level,
-        body: Body
+        body: Body,
+        base_fov: int = 8
     ):
         super().__init__(
             x=x,
@@ -100,6 +101,7 @@ class Actor(Entity):
             blocks_movement=True,
             render_order=RenderOrder.ACTOR,
         )
+        self.base_fov = base_fov
 
         self.ai: Optional[BaseAI] = ai_cls(self)
 
