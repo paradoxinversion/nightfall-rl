@@ -101,6 +101,22 @@ class RectangularRoom:
             and self.y2 >= other.y1
         )
 
+class Area:
+    def __init__(self, width: int, height: int):
+        self._width = width
+        self._height = height
+
+    def inner(self) -> Tuple[slice, slice]:
+        """Return the inner area of this room as a 2D array index."""
+        return slice(0, self._width), slice(0, self._height)
+
+    @property
+    def center(self) -> Tuple[int, int]:
+        center_x = int(self._width / 2)
+        center_y = int(self._height / 2)
+
+        return center_x, center_y
+
 def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) -> None:
     number_of_monsters = random.randint(
         0, get_max_value_for_floor(max_monsters_by_floor, floor_number)
@@ -115,13 +131,29 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
     items: List[Entity] = get_entities_at_random(
         item_chances, number_of_items, floor_number
     )
-    for entity in monsters + items:
+    # for entity in monsters + items:
+    for entity in items:
             x = random.randint(room.x1 + 1, room.x2 - 1)
             y = random.randint(room.y1 + 1, room.y2 - 1)
 
             if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
                 entity.spawn(dungeon, x, y)
 
+def place_entities_area(area_map: GameMap) -> None:
+    number_of_items = random.randint(
+        0, get_max_value_for_floor(max_items_by_floor, 1)
+    )
+
+    items: List[Entity] = get_entities_at_random(
+        item_chances, number_of_items, 1
+    )
+    # for entity in monsters + items:
+    for entity in items:
+            x = random.randint(0, area_map.width - 1)
+            y = random.randint(0, area_map.height - 1)
+
+            if not any(entity.x == x and entity.y == y for entity in area_map.entities):
+                entity.spawn(area_map, x, y)
 def tunnel_between(
   start: Tuple[int, int], end: Tuple[int, int]
 ) -> Iterator[Tuple[int, int]]:
@@ -189,3 +221,52 @@ def generate_dungeon(
       rooms.append(new_room)
 
   return dungeon
+
+def generate_area_map(
+   map_width: int,
+   map_height: int,
+   engine: Engine,
+) -> GameMap:
+    """Generate a new area map."""
+    player = engine.player
+    area = GameMap(engine, map_width, map_height, entities=[player])
+    new_area = Area(map_width, map_height)
+    player.place(*new_area.center, area)
+    place_entities_area(area)
+    area.tiles[new_area.inner()] = tile_types.floor
+    # for x, y in area.tiles:
+
+    return area
+#   for r in range(max_rooms):
+#       room_width = random.randint(room_min_size, room_max_size)
+#       room_height = random.randint(room_min_size, room_max_size)
+
+#       x = random.randint(0, dungeon.width - room_width - 1)
+#       y = random.randint(0, dungeon.height - room_height - 1)
+
+#       # "RectangularRoom" class makes rectangles easier to work with
+#       new_room = RectangularRoom(x, y, room_width, room_height)
+
+#       # Run through the other rooms and see if they intersect with this one.
+#       if any(new_room.intersects(other_room) for other_room in rooms):
+#           continue  # This room intersects, so go to the next attempt.
+#       # If there are no intersections then the room is valid.
+
+#       # Dig out this rooms inner area.
+#       dungeon.tiles[new_room.inner] = tile_types.floor
+
+#       if len(rooms) == 0:
+#           # The first room, where the player starts.
+#           player.place(*new_room.center, dungeon)
+#       else:  # All rooms after the first.
+#           # Dig out a tunnel between this room and the previous one.
+#           for x, y in tunnel_between(rooms[-1].center, new_room.center):
+#               dungeon.tiles[x, y] = tile_types.floor
+#           center_of_last_room = new_room.center
+#       place_entities(new_room, area, engine.game_world.current_floor)
+#       dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+#       dungeon.downstairs_location = center_of_last_room
+#       # Finally, append the new room to the list.
+#       rooms.append(new_room)
+
+#   return dungeon

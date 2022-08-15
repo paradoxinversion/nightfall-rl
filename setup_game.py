@@ -26,7 +26,7 @@ def new_game() -> Engine:
     max_rooms = 30
 
     player = copy.deepcopy(entity_factories.player)
-    time_cycle = TimeCycle(10, 1)
+    time_cycle = TimeCycle(5, 5, 5, 5)
 
     engine = Engine(player=player, time_cycle=time_cycle)
 
