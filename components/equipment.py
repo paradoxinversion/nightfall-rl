@@ -62,7 +62,16 @@ class Equipment(BaseComponent):
 
         if add_message:
             self.equip_message(item.name)
+    def equip_to_bp_slot(self, slot: str, item: Item, add_message: bool) -> None:
+        current_item = getattr(self, slot)
 
+        if current_item is not None:
+            self.unequip_from_slot(slot, add_message)
+
+        setattr(self, slot, item)
+
+        if add_message:
+            self.equip_message(item.name)
     def unequip_from_slot(self, slot: str, add_message: bool) -> None:
         current_item = getattr(self, slot)
 

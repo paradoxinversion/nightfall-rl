@@ -1,6 +1,33 @@
 entity.py
 
-
+- [Classes](#classes)
+  - [Entity()](#entity)
+    - [Class Fields](#class-fields)
+      - [entity.parent: Union[GameMap, Inventory]](#entityparent-uniongamemap-inventory)
+    - [Instance Fields](#instance-fields)
+      - [entity.x: int](#entityx-int)
+      - [entity.y: int](#entityy-int)
+      - [entity.char: str](#entitychar-str)
+      - [entity.color: Tuple[int, int, int]](#entitycolor-tupleint-int-int)
+      - [entity.name: str](#entityname-str)
+      - [entity.blocks_movement: bool](#entityblocks_movement-bool)
+      - [entity.render_order: RenderOrder](#entityrender_order-renderorder)
+    - [Properties](#properties)
+      - [entity.gameMap](#entitygamemap)
+    - [Class Methods](#class-methods)
+      - [entity.spawn(self: T, gamemap: GameMap, x: int, y: int) -> T](#entityspawnself-t-gamemap-gamemap-x-int-y-int---t)
+      - [entity.place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> float](#entityplaceself-x-int-y-int-gamemap-optionalgamemap--none---float)
+      - [entity.distance(self, x: int, y: int) -> float](#entitydistanceself-x-int-y-int---float)
+      - [entity.move(self, dx: int, dy: int) -> None](#entitymoveself-dx-int-dy-int---none)
+  - [Actor(Entity)](#actorentity)
+    - [\_\_init__ params](#__init__-params)
+      - [x: int](#x-int)
+      - [y: int](#y-int)
+      - [char: str](#char-str)
+      - [color:](#color)
+      - [name: str](#name-str)
+      - [blocks_movement: str](#blocks_movement-str)
+  - [Instance Vars](#instance-vars)
 
 ## Classes
 
@@ -8,61 +35,61 @@ entity.py
 
 #### Class Fields
 
-#####  parent: Union[GameMap, Inventory]
+#####  entity.parent: Union[GameMap, Inventory]
 
 Parent may be provided after the entity is created.
 
 #### Instance Fields
 
-##### x: int
+##### entity.x: int
 
 The entity's x position on the current map.
 
-##### y: int
+##### entity.y: int
 
 The entity's y position on the current map.
 
-##### char: str
+##### entity.char: str
 
 The character that represents the entity.
 
-##### color: Tuple[int, int, int] 
+##### entity.color: Tuple[int, int, int] 
 
 The entity's default color.
 
-##### name: str
+##### entity.name: str
 
 The name of the entity. This is displayed in the game.
 
-##### blocks_movement: bool
+##### entity.blocks_movement: bool
 
 Whether or not the entity prevents movement through it
 
-##### render_order: RenderOrder
+##### entity.render_order: RenderOrder
 
 The z-order of this entity on the map. 
 
 #### Properties
 
-##### gameMap
+##### entity.gameMap
 
 A reference to the current game map.
 
 #### Class Methods
 
-##### spawn(self: T, gamemap: GameMap, x: int, y: int) -> T
+##### entity.spawn(self: T, gamemap: GameMap, x: int, y: int) -> T
 
 Spawn a copy of the entity's instance at the given location.
 
-##### place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> float
+##### entity.place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> float
 
 Place the entity at a new location.  Handles moving across GameMaps.
 
-##### distance(self, x: int, y: int) -> float
+##### entity.distance(self, x: int, y: int) -> float
 
 Return the distance between the current entity and the given (x, y) coordinate.
 
-##### move(self, dx: int, dy: int) -> None
+##### entity.move(self, dx: int, dy: int) -> None
 
 Moves the entity by a given amount by the next frame
 
@@ -90,17 +117,27 @@ __init__(
 
 ##### x: int
 
-The entity's initial x position
+See [x: int](#x-int)
 
 ##### y: int
 
-The entity's initial y position
+See [y: int](#y-int)
 
 ##### char: str
 
-The entity's representative character
+See [char: str](#char-str)
 
 ##### color: 
+
+see [color: int](#color-tupleint-int-int)
+
+##### name: str
+
+See [name: str](#name-str)
+
+##### blocks_movement: str
+
+See [name: str](#blocks-movement)
 
 ### Instance Vars
 
