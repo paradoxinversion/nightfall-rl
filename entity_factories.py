@@ -1,4 +1,4 @@
-from components.ai import HostileEnemy
+from components.ai import HostileEnemy, NPC
 from components import consumable, equippable
 from components.equipment import Equipment
 from components.fighter import Fighter
@@ -11,11 +11,23 @@ player = Actor(
     char="@",
     color=(255, 255, 255),
     name="Player",
-    ai_cls=HostileEnemy,
+    ai_cls=NPC,
     equipment=Equipment(),
     fighter=Fighter(hp=30, base_defense=1, base_power=2),
     inventory=Inventory(capacity=26),
     level=Level(level_up_base=200),
+    body=Body(race="human")
+)
+
+person = Actor(
+    char="@",
+    color=(63, 127, 63),
+    name="Person",
+    ai_cls=NPC,
+    equipment=Equipment(),
+    fighter=Fighter(hp=10, base_defense=0, base_power=3),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=35),
     body=Body(race="human")
 )
 
@@ -77,13 +89,13 @@ dagger = Item(
 
 sword = Item(char="/", color=(0, 191, 255), name="Sword", equippable=equippable.Sword())
 
-leather_armor = Item(
+leather_jacket = Item(
     char="[",
     color=(139, 69, 19),
-    name="Leather Armor",
-    equippable=equippable.LeatherArmor(),
+    name="Leather Jacket",
+    equippable=equippable.Jacket(),
 )
 
-chain_mail = Item(
-    char="[", color=(139, 69, 19), name="Chain Mail", equippable=equippable.ChainMail()
+pants = Item(
+    char="$", color=(139, 69, 19), name="Ragged Pants", equippable=equippable.ChainMail()
 )

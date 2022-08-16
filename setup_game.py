@@ -26,7 +26,11 @@ def new_game() -> Engine:
     max_rooms = 30
 
     player = copy.deepcopy(entity_factories.player)
-    time_cycle = TimeCycle(10, 10, 10, 10)
+    time_cycle = TimeCycle(
+        phase_ticks_dawn = 50, 
+        phase_ticks_daytime=200, 
+        phase_ticks_dusk=50, 
+        phase_ticks_nighttime= 200)
 
     engine = Engine(player=player, time_cycle=time_cycle)
 
@@ -47,16 +51,21 @@ def new_game() -> Engine:
     )
     player.parent = engine.game_map
     dagger = copy.deepcopy(entity_factories.dagger)
-    leather_armor = copy.deepcopy(entity_factories.leather_armor)
+    leather_jacket = copy.deepcopy(entity_factories.leather_jacket)
+    pants = copy.deepcopy(entity_factories.pants)
 
     dagger.parent = player.inventory
-    leather_armor.parent = player.inventory
+    leather_jacket.parent = player.inventory
+    pants.parent = player.inventory
+
+    player.inventory.items.append(pants)
+    player.equipment.toggle_equip(pants, add_message=False)
 
     player.inventory.items.append(dagger)
     player.equipment.toggle_equip(dagger, add_message=False)
 
-    player.inventory.items.append(leather_armor)
-    player.equipment.toggle_equip(leather_armor, add_message=False)
+    player.inventory.items.append(leather_jacket)
+    player.equipment.toggle_equip(leather_jacket, add_message=False)
 
     return engine
 

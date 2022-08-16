@@ -1,4 +1,5 @@
 from __future__ import annotations
+from distutils.command.build import build
 import random
 from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING
 import tcod
@@ -25,7 +26,7 @@ item_chances: Dict[int, List[Tuple[Entity, int]]] = {
     0: [(entity_factories.health_potion, 35)],
     2: [(entity_factories.confusion_scroll, 10)],
     4: [(entity_factories.lightning_scroll, 25), (entity_factories.sword, 5)],
-    6: [(entity_factories.fireball_scroll, 25), (entity_factories.chain_mail, 15)],
+    6: [(entity_factories.fireball_scroll, 25), (entity_factories.pants, 15)],
 }
 
 enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
@@ -34,6 +35,17 @@ enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
     5: [(entity_factories.troll, 30)],
     7: [(entity_factories.troll, 60)],
 }
+
+actor_type_chances: Dict[int, List[Tuple[Entity, int]]] = {
+    0: [(entity_factories.person, 80)]
+}
+
+house = [
+    "#####",
+    "#   #",
+    "#   #",
+    "##  #"
+]
 
 def get_max_value_for_floor(
     max_value_by_floor: List[Tuple[int, int]], floor: int
@@ -92,6 +104,7 @@ class RectangularRoom:
     def inner(self) -> Tuple[slice, slice]:
         """Return the inner area of this room as a 2D array index."""
         return slice(self.x1 + 1, self.x2), slice(self.y1 + 1, self.y2)
+
     def intersects(self, other: RectangularRoom) -> bool:
         """Return True if this room overlaps with another RectangularRoom."""
         return (
@@ -99,6 +112,25 @@ class RectangularRoom:
             and self.x2 >= other.x1
             and self.y1 <= other.y2
             and self.y2 >= other.y1
+        )
+
+class Building:
+    def __init__(self, x: int, y: int, building_schematic: list[str]):
+        self.height = building_schematic.__len__()
+        self.width = building_schematic[0].__len__()
+        self.x = x
+        self.y = y
+        self.x2 = x + self.width
+        self.y2 = y + self.height
+        self.schematic = building_schematic
+
+    def intersects(self, other: RectangularRoom) -> bool:
+        """Return True if this room overlaps with another Building."""
+        return (
+            self.x <= other.x
+            and self.x >= other.x
+            and self.y <= other.y
+            and self.y >= other.y
         )
 
 class Area:
@@ -143,12 +175,14 @@ def place_entities_area(area_map: GameMap) -> None:
     number_of_items = random.randint(
         0, get_max_value_for_floor(max_items_by_floor, 1)
     )
-
+    actors: List[Entity] = get_entities_at_random(
+        actor_type_chances, 3, 0
+    )
     items: List[Entity] = get_entities_at_random(
         item_chances, number_of_items, 1
     )
     # for entity in monsters + items:
-    for entity in items:
+    for entity in items + actors:
             x = random.randint(0, area_map.width - 1)
             y = random.randint(0, area_map.height - 1)
 
@@ -226,12 +260,33 @@ def generate_area_map(
    map_width: int,
    map_height: int,
    engine: Engine,
+#    max_buildings: int
 ) -> GameMap:
     """Generate a new area map."""
     player = engine.player
     area = GameMap(engine, map_width, map_height, entities=[player])
     new_area = Area(map_width, map_height)
-    player.place(*new_area.center, area)
     place_entities_area(area)
     area.tiles[new_area.inner()] = tile_types.floor
+    buildings: List[Building] = []
+
+    max_buildings = 5
+    player.place(5, 5, area)
+    for b in range(max_buildings):
+        schematic = house
+        schematic_h = len(schematic[0])
+        schematic_w = len(schematic)
+        x = random.randint(0, area.width - schematic_w - 3)
+        y = random.randint(0, area.height - schematic_h - 3)
+        print(f"{x} {y}")
+        new_building = Building(x, y, house)
+        # if any(new_building.intersects(building) for building in buildings):
+        #     continue 
+        for by in range(schematic_h):
+            for bx in range(schematic_w):
+                if new_building.schematic[bx][by] == "#":
+                    area.tiles[by][bx] = tile_types.wall
+
+
+        buildings.append(new_building)
     return area
