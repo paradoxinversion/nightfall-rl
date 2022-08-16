@@ -15,6 +15,7 @@ class BodyPart():
         self.max_damage_lethal = max_damage_lethal
         self.bodypart_type = bodypart_type
         self._attacks = attacks
+        self.equipped_item = None
 
     @property
     def name(self) -> str:

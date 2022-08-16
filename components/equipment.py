@@ -9,9 +9,11 @@ if TYPE_CHECKING:
 class Equipment(BaseComponent):
     parent: Actor
 
-    def __init__(self, weapon: Optional[Item] = None, armor: Optional[Item] = None):
+    def __init__(self, weapon: Optional[Item] = None, armor: Optional[Item] = None, item: Optional[Item] = None,):
         self.weapon = weapon
         self.armor = armor
+        # eveeything is an item
+        self.item = item
 
     @property
     def defense_bonus(self) -> int:

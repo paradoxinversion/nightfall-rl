@@ -44,9 +44,11 @@ class Entity:
             # If parent isn't provided now then it will be set later.
             self.parent = parent
             parent.entities.add(self)
+
     @property
     def gamemap(self) -> GameMap:
         return self.parent.gamemap
+
     def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
        """Spawn a copy of this instance at the given location."""
        clone = copy.deepcopy(self)
@@ -65,6 +67,7 @@ class Entity:
                 if self.parent is self.gamemap:
                     self.gamemap.entities.remove(self)
             self.parent = gamemap
+            
     def distance(self, x: int, y: int) -> float:
         """
         Return the distance between the current entity and the given (x, y) coordinate.
