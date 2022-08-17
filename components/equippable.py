@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 from enum import Enum
 from components.base_component import BaseComponent
+from components.body import BodyPartTypes
 from equipment_types import EquipmentType
 
 if TYPE_CHECKING:
@@ -16,7 +17,7 @@ class Equippable(BaseComponent):
 
     def __init__(
         self,
-        body_slots,
+        body_slots, # what 
         equippable_type: EquippableType,
         equipment_type: EquipmentType,
         power_bonus: int = 0,
@@ -30,26 +31,24 @@ class Equippable(BaseComponent):
 
 class Dagger(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.HELD_OBJECT, equipment_type=EquipmentType.WEAPON, power_bonus=2, body_slots=["arm"])
-
+        super().__init__(equippable_type=EquippableType.HELD_OBJECT, equipment_type=EquipmentType.WEAPON, power_bonus=2, body_slots=[BodyPartTypes.ARM])
 
 class Sword(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.HELD_OBJECT, equipment_type=EquipmentType.WEAPON, power_bonus=4, body_slots=["arm"])
-
+        super().__init__(equippable_type=EquippableType.HELD_OBJECT, equipment_type=EquipmentType.WEAPON, power_bonus=4, body_slots=[BodyPartTypes.ARM])
 
 class LeatherArmor(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=["arm"])
+        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=[BodyPartTypes.ARM])
 
 class Jacket(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=["arm", "torso"])
+        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=[BodyPartTypes.ARM, BodyPartTypes.TORSO])
 
 class Pants(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=["leg"])
+        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=1, body_slots=[BodyPartTypes.LEG])
 
 class ChainMail(Equippable):
     def __init__(self) -> None:
-        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=3, body_slots=["arm"])
+        super().__init__(equippable_type=EquippableType.WORN_ARTICLE, equipment_type=EquipmentType.ARMOR, defense_bonus=3, body_slots=[BodyPartTypes.ARM])

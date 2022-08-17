@@ -446,32 +446,23 @@ class CharacterScreenEventHandler(AskUserEventHandler):
         total_hp = 0
         for part in self.engine.player.body.body_parts.values():
             total_hp += part.hp
+
         console.print(
             x=x + 1, y=y + 6, string=f"Body: {self.engine.player.body.current_hp}/{self.engine.player.body.total_hp}"
         )
-        console.print(
-            x=x + 1, y=y + 7, string=f"Head: {self.engine.player.body.body_parts.get('head').hp}"
-        )
 
-        console.print(
-            x=x + 1, y=y + 8, string=f"Torso: {self.engine.player.body.body_parts.get('torso').hp}"
-        )
+        # Body Info
+        bp_rows_start = y + 7
+        bp_row = 0
+        for body_part in self.engine.player.body.body_parts.values():
+            equipped_items = body_part.equipped_items
+            worn = "" if equipped_items[0] == None else equipped_items[0].name
+            held = "" if equipped_items[1] == None else equipped_items[1].name
+            console.print(
+                x=x + 1, y=bp_rows_start + bp_row, string=f"{body_part.name} | {body_part.hp}HP | {worn} | {held}"
+            )
+            bp_row=bp_row+1
 
-        console.print(
-            x=x + 1, y=y + 9, string=f"Right Arm: {self.engine.player.body.body_parts.get('right_arm').hp}"
-        )
-
-        console.print(
-            x=x + 1, y=y + 10, string=f"Left Arm: {self.engine.player.body.body_parts.get('left_arm').hp}"
-        )
-
-        console.print(
-            x=x + 1, y=y + 11, string=f"Right Leg: {self.engine.player.body.body_parts.get('right_leg').hp}"
-        )
-
-        console.print(
-            x=x + 1, y=y + 12, string=f"Left Leg: {self.engine.player.body.body_parts.get('left_leg').hp}"
-        )
 class LevelUpEventHandler(AskUserEventHandler):
     TITLE = "Level Up"
 

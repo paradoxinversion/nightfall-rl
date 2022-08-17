@@ -278,7 +278,6 @@ def generate_area_map(
         schematic_w = len(schematic)
         x = random.randint(0, area.width - schematic_w - 3)
         y = random.randint(0, area.height - schematic_h - 3)
-        print(f"{x} {y}")
         new_building = Building(x, y, house)
         # if any(new_building.intersects(building) for building in buildings):
         #     continue 

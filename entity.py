@@ -108,8 +108,12 @@ class Actor(Entity):
 
         self.ai: Optional[BaseAI] = ai_cls(self)
 
+        self.body: Body = body
+        self.body.parent = self
+
         self.equipment: Equipment = equipment
         self.equipment.parent = self
+        self.equipment.worn_articles: dict[str, Equippable | None] = dict.fromkeys(self.body.body_parts.keys(), None)
 
         self.fighter: Fighter= fighter
         self.fighter.parent = self
@@ -120,8 +124,7 @@ class Actor(Entity):
         self.level: Level = level
         self.level.parent = self
 
-        self.body: Body = body
-        self.body.parent = self
+        
         
     @property
     def is_alive(self) -> bool:

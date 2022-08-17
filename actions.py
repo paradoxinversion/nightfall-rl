@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Tuple, TYPE_CHECKING
+from typing import Optional, Tuple, List, TYPE_CHECKING
 import color
 import exceptions
 import random
@@ -7,6 +7,7 @@ from combat import Attack
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Actor, Entity, Item
+    from components.body import BodyPart, BodyPartTypes
 
 class Action:
     def __init__(self, entity: Actor) -> None:
@@ -83,9 +84,8 @@ class EquipAction(Action):
         super().__init__(entity)
 
         self.item = item
-
     def perform(self) -> None:
-        self.entity.equipment.toggle_equip(self.item)
+        self.entity.equipment.toggle_equip_bp(self.item)
 
 class WaitAction(Action):
     def perform(self) -> None:

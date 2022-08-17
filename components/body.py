@@ -5,7 +5,7 @@ from xml.sax.handler import property_interning_dict
 from components.base_component import BaseComponent
 from copy import deepcopy
 if TYPE_CHECKING:
-    from entity import Actor
+    from entity import Actor, Item
 
 class BodyPartTypes(Enum):
     HEAD = 0
@@ -16,13 +16,15 @@ class BodyPartTypes(Enum):
 
 class BodyPart():
     parent: Body
-    def __init__(self, name: str, bodypart_type: str, hp: int, max_damage_lethal=False, attacks=False):
+    def __init__(self, name: str, bodypart_type: BodyPartTypes, hp: int, max_damage_lethal=False, attacks=False):
         self._name = name
         self._hp = hp
         self.max_hp = hp
         self.max_damage_lethal = max_damage_lethal
         self.bodypart_type = bodypart_type
         self._attacks = attacks
+        self.worn_article = None
+        self.held_object = None
 
     @property
     def name(self) -> str:
@@ -37,6 +39,11 @@ class BodyPart():
     def actor(self) -> Actor:
         """Return the BodyPart's Actor"""
         return self.parent.parent
+
+    @property
+    def equipped_items(self) -> List[Item]:
+        """Return the body part's worn article and held object"""
+        return [self.worn_article, self.held_object]
 
     @property
     def body(self) -> Body:
@@ -151,3 +158,11 @@ class Body(BaseComponent):
             if body_part.can_attack:
                 dbp.append(body_part)
         return dbp
+
+    def get_parts_of_type(self, part_type: BodyPartTypes) -> List[BodyPart]:
+        """Returns a list of body parts that match a given part_type"""
+        parts = []
+        for body_part in self.body_parts.values():
+            if body_part.bodypart_type == part_type:
+                parts.append(body_part)
+        return parts

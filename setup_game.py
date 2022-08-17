@@ -59,13 +59,13 @@ def new_game() -> Engine:
     pants.parent = player.inventory
 
     player.inventory.items.append(pants)
-    player.equipment.toggle_equip(pants, add_message=False)
+    player.equipment.toggle_equip_bp(pants, add_message=False)
 
     player.inventory.items.append(dagger)
-    player.equipment.toggle_equip(dagger, add_message=False)
+    player.equipment.toggle_equip_bp(dagger, add_message=False)
 
     player.inventory.items.append(leather_jacket)
-    player.equipment.toggle_equip(leather_jacket, add_message=False)
+    player.equipment.toggle_equip_bp(leather_jacket, add_message=False)
 
     return engine
 
