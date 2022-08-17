@@ -13,7 +13,7 @@ class Equipment(BaseComponent):
         self.weapon = weapon
         self.armor = armor
         # eveeything is an item
-        self.item = item
+        self.worn_articles = {}
 
     @property
     def defense_bonus(self) -> int:
@@ -62,7 +62,11 @@ class Equipment(BaseComponent):
 
         if add_message:
             self.equip_message(item.name)
+
     def equip_to_bp_slot(self, slot: str, item: Item, add_message: bool) -> None:
+        """Equip the current item to the appropriate body slot"""
+        # is the item we're trying to equip goof
+        # we need to see if the item is 
         current_item = getattr(self, slot)
 
         if current_item is not None:
