@@ -44,9 +44,29 @@ house = [
     "#####",
     "#   #",
     "#   #",
-    "##  #"
+    "###D#"
 ]
 
+big_house = [
+    "########",
+    "#      #",
+    "#      #",
+    "###D####"
+]
+
+odd_house = [
+    '####D###....',
+    '#......#....',
+    '#......#....',
+    '#......#####',
+    '#..........#',
+    '#..........#',
+    '#......#####',
+    '#......#....',
+    '########....'
+]
+
+building_schematics = [house, big_house, odd_house]
 def get_max_value_for_floor(
     max_value_by_floor: List[Tuple[int, int]], floor: int
 ) -> int:
@@ -124,13 +144,13 @@ class Building:
         self.y2 = y + self.height
         self.schematic = building_schematic
 
-    def intersects(self, other: RectangularRoom) -> bool:
-        """Return True if this room overlaps with another Building."""
+    def intersects(self, other: Building) -> bool:
+        """Return True if this Building overlaps with another Building."""
         return (
-            self.x <= other.x
-            and self.x >= other.x
-            and self.y <= other.y
-            and self.y >= other.y
+            self.x <= other.x2
+            and self.x2 >= other.x
+            and self.y <= other.y2
+            and self.y2 >= other.y
         )
 
 class Area:
@@ -181,13 +201,14 @@ def place_entities_area(area_map: GameMap) -> None:
     items: List[Entity] = get_entities_at_random(
         item_chances, number_of_items, 1
     )
-    # for entity in monsters + items:
     for entity in items + actors:
             x = random.randint(0, area_map.width - 1)
             y = random.randint(0, area_map.height - 1)
+            entity.initialize()
 
             if not any(entity.x == x and entity.y == y for entity in area_map.entities):
                 entity.spawn(area_map, x, y)
+                
 def tunnel_between(
   start: Tuple[int, int], end: Tuple[int, int]
 ) -> Iterator[Tuple[int, int]]:
@@ -270,22 +291,31 @@ def generate_area_map(
     area.tiles[new_area.inner()] = tile_types.floor
     buildings: List[Building] = []
 
-    max_buildings = 5
+    max_buildings = 10
     player.place(5, 5, area)
     for b in range(max_buildings):
-        schematic = house
-        schematic_h = len(schematic[0])
-        schematic_w = len(schematic)
-        x = random.randint(0, area.width - schematic_w - 3)
-        y = random.randint(0, area.height - schematic_h - 3)
-        new_building = Building(x, y, house)
-        # if any(new_building.intersects(building) for building in buildings):
-        #     continue 
-        for by in range(schematic_h):
-            for bx in range(schematic_w):
-                if new_building.schematic[bx][by] == "#":
-                    area.tiles[by][bx] = tile_types.wall
+        schematic = random.choice(list(building_schematics))
+        print(schematic)
+        schematic_h = len(schematic)
+        schematic_w = len(schematic[0])
+        x = random.randint(0, area.width - schematic_w - 5)
+        y = random.randint(0, area.height - schematic_h - 5)
+        new_building = Building(x, y, schematic)
+        placement_attempts = 0
+
+        while placement_attempts < 10:
+            placement_attempts += 1
+            if any(new_building.intersects(other_room) for other_room in buildings):
+                continue
+            for by in range(schematic_h):
+                for bx in range(schematic_w):
+                    print(f"{bx}, {by}")
+                    if new_building.schematic[by][bx] == "#":
+                        area.tiles[bx + x][y + by] = tile_types.wall
+            break
+
 
 
         buildings.append(new_building)
+    print(f"Created {len(buildings)} buildings")
     return area

@@ -3,7 +3,7 @@ import copy
 import math
 from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
 from render_order import RenderOrder
-
+from namegen import NameGenerator
 if TYPE_CHECKING:
     from components.ai import BaseAI
     from components.consumable import Consumable
@@ -78,6 +78,9 @@ class Entity:
         self.x += dx
         self.y += dy
 
+    def initialize(self):
+        pass
+
 class Actor(Entity):
     def __init__(
         self,
@@ -104,6 +107,8 @@ class Actor(Entity):
             blocks_movement=True,
             render_order=RenderOrder.ACTOR,
         )
+        self.first_name: str = "<Unnamed>"
+        self.last_name: str = "<Unnamed>"
         self.base_fov = base_fov
 
         self.ai: Optional[BaseAI] = ai_cls(self)
@@ -122,14 +127,18 @@ class Actor(Entity):
         self.inventory.parent = self
 
         self.level: Level = level
-        self.level.parent = self
-
-        
+        self.level.parent = self        
         
     @property
     def is_alive(self) -> bool:
         """Returns True as long as this actor can perform actions."""
         return bool(self.ai)
+
+    def initialize(self):
+        self.first_name: str = NameGenerator.get_first_name()
+        self.last_name: str = NameGenerator.get_last_name()
+        full_name = f"{self.first_name} {self.last_name}"
+        self.name = full_name
 
 class Item(Entity):
     def __init__(

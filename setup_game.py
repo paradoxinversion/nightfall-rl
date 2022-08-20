@@ -12,7 +12,7 @@ import entity_factories
 from game_map import GameWorld
 import input_handlers
 from time_cycles import TimeCycle
-
+from namegen import NameGenerator
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
@@ -78,7 +78,7 @@ def load_game(filename: str) -> Engine:
 
 class MainMenu(input_handlers.BaseEventHandler):
     """Handle the main menu rendering and input."""
-
+    NameGenerator.load_names()
     def on_render(self, console: tcod.Console) -> None:
         """Render the main menu on a background image."""
         console.draw_semigraphics(background_image, 0, 0)

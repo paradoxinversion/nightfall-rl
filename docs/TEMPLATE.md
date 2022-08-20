@@ -9,5 +9,3 @@ Explain basically what this module is and why it exists here.
 #### Class Fields
 
 #### Instance Fields
-
-

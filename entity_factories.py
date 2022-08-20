@@ -10,7 +10,6 @@ from entity import Actor, Item
 player = Actor(
     char="@",
     color=(255, 255, 255),
-    name="Player",
     ai_cls=NPC,
     equipment=Equipment(),
     fighter=Fighter(hp=30, base_defense=1, base_power=2),
@@ -22,7 +21,6 @@ player = Actor(
 person = Actor(
     char="@",
     color=(63, 127, 63),
-    name="Person",
     ai_cls=NPC,
     equipment=Equipment(),
     fighter=Fighter(hp=10, base_defense=0, base_power=3),
@@ -34,7 +32,6 @@ person = Actor(
 orc = Actor(
     char="o",
     color=(63, 127, 63),
-    name="Orc",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
     fighter=Fighter(hp=10, base_defense=0, base_power=3),
@@ -46,7 +43,6 @@ orc = Actor(
 troll = Actor(
     char="T",
     color=(0, 127, 0),
-    name="Troll",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
     fighter=Fighter(hp=16, base_defense=1, base_power=4),
