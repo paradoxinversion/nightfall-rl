@@ -151,6 +151,7 @@ class Item(Entity):
         name: str = "<Unnamed>",
         consumable: Optional[Consumable] = None,
         equippable: Optional[Equippable] = None,
+        blocks_movement: bool= False
     ):
         super().__init__(
             x=x,
@@ -158,7 +159,7 @@ class Item(Entity):
             char=char,
             color=color,
             name=name,
-            blocks_movement=False,
+            blocks_movement=blocks_movement,
             render_order=RenderOrder.ITEM,
         )
 
