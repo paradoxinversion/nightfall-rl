@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterable, Iterator, Optional, TYPE_CHECKING
+from typing import Iterable, Iterator, List, Optional, TYPE_CHECKING
 import numpy as np  # type: ignore
 from tcod.console import Console
 from entity import Actor, Item
@@ -8,6 +8,7 @@ import tile_types
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
+    from building import Building
 
 class GameMap:
     def __init__(
@@ -16,6 +17,7 @@ class GameMap:
         self.engine = engine
         self.width, self.height = width, height
         self.entities = set(entities)
+        self.buildings: List[Building]= []
         self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
         self.visible = np.full(
             (width, height), fill_value=False, order="F"

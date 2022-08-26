@@ -1,13 +1,13 @@
 from __future__ import annotations
 import copy
-from distutils.command.build import build
 import random
-from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING
+from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING, Optional
 import tcod
 import entity_factories
 from game_map import GameMap
 import tile_types
 from entity import Actor
+from building import Building, BuildingType
 if TYPE_CHECKING:
    from engine import Engine
    from entity import Entity, Actor
@@ -43,15 +43,19 @@ actor_type_chances: Dict[int, List[Tuple[Entity, int]]] = {
 
 house = [
     "#####",
-    "#   #",
-    "#   #",
+    "#...#",
+    "#...#",
+    "#...#",
     "###D#"
 ]
 
 big_house = [
     "########",
-    "#      #",
-    "#      #",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
     "###D####"
 ]
 
@@ -62,7 +66,9 @@ odd_house = [
     '#......#####',
     '#..........#',
     '#..........#',
+    '#..........#',
     '#......#####',
+    '#......#....',
     '#......#....',
     '########....'
 ]
@@ -135,29 +141,11 @@ class RectangularRoom:
             and self.y2 >= other.y1
         )
 
-class Building:
-    def __init__(self, x: int, y: int, building_schematic: list[str]):
-        self.height = building_schematic.__len__()
-        self.width = building_schematic[0].__len__()
-        self.x = x
-        self.y = y
-        self.x2 = x + self.width
-        self.y2 = y + self.height
-        self.schematic = building_schematic
-
-    def intersects(self, other: Building) -> bool:
-        """Return True if this Building overlaps with another Building."""
-        return (
-            self.x <= other.x2
-            and self.x2 >= other.x
-            and self.y <= other.y2
-            and self.y2 >= other.y
-        )
-
 class Area:
     def __init__(self, width: int, height: int):
         self._width = width
         self._height = height
+        self.buildings = []
 
     def inner(self) -> Tuple[slice, slice]:
         """Return the inner area of this room as a 2D array index."""
@@ -191,6 +179,15 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
 
             if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
                 entity.spawn(dungeon, x, y)
+
+def place_actors(area: GameMap) -> None:
+    # get houses
+    for building in area.buildings:
+        if building.building_type == BuildingType.HOUSE:
+            # Spawn entity here
+            actor: Entity = entity_factories.person
+            x,y = building.center
+            actor.spawn(area, x, y, [entity_factories.pants])
 
 def place_entities_area(area_map: GameMap) -> None:
     number_of_items = random.randint(
@@ -289,7 +286,6 @@ def generate_area_map(
     player = engine.player
     area = GameMap(engine, map_width, map_height, entities=[player])
     new_area = Area(map_width, map_height)
-    place_entities_area(area)
     area.tiles[new_area.inner()] = tile_types.floor
     buildings: List[Building] = []
 
@@ -313,14 +309,15 @@ def generate_area_map(
                     if new_building.schematic[by][bx] == "#":
                         area.tiles[bx + x][y + by] = tile_types.wall
                     if new_building.schematic[by][bx] == "D":
-                        # area.tiles[bx + x][y + by].
                         door = copy.deepcopy(entity_factories.door)
                         door_x = x+bx
                         door_y = y+by
                         door.spawn(area, door_x, door_y)
                         area.tiles["transparent"][door_x][door_y] = False
+            buildings.append(new_building)
             break
 
-        buildings.append(new_building)
     print(f"Created {len(buildings)} buildings")
+    area.buildings = buildings
+    place_actors(area)
     return area
