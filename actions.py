@@ -146,6 +146,10 @@ class MovementAction(ActionWithDirection):
             # Destination is blocked by a tile.
             raise exceptions.Impossible("That way is blocked.")
         if self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+            blocking_entity = self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y)
+            if blocking_entity.name == "Door":
+                blocking_entity.blocks_movement = False
+                blocking_entity.char = ""
             # Destination is blocked by an entity.
             raise exceptions.Impossible("That way is blocked.")
         self.entity.move(self.dx, self.dy)

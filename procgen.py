@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 from distutils.command.build import build
 import random
 from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING
@@ -6,10 +7,10 @@ import tcod
 import entity_factories
 from game_map import GameMap
 import tile_types
-
+from entity import Actor
 if TYPE_CHECKING:
    from engine import Engine
-   from entity import Entity
+   from entity import Entity, Actor
 
 max_items_by_floor = [
     (1, 1),
@@ -204,10 +205,11 @@ def place_entities_area(area_map: GameMap) -> None:
     for entity in items + actors:
             x = random.randint(0, area_map.width - 1)
             y = random.randint(0, area_map.height - 1)
-            entity.initialize()
-
-            if not any(entity.x == x and entity.y == y for entity in area_map.entities):
-                entity.spawn(area_map, x, y)
+            if isinstance(entity, Actor):
+                entity.spawn(area_map, x, y, [entity_factories.pants])
+            else:
+                if not any(entity.x == x and entity.y == y for entity in area_map.entities):
+                    entity.spawn(area_map, x, y)
                 
 def tunnel_between(
   start: Tuple[int, int], end: Tuple[int, int]
@@ -295,26 +297,29 @@ def generate_area_map(
     player.place(5, 5, area)
     for b in range(max_buildings):
         schematic = random.choice(list(building_schematics))
-        print(schematic)
         schematic_h = len(schematic)
         schematic_w = len(schematic[0])
         x = random.randint(0, area.width - schematic_w - 5)
         y = random.randint(0, area.height - schematic_h - 5)
         new_building = Building(x, y, schematic)
         placement_attempts = 0
-
+        # FIXME: Buildings that can't be placed are put into `buildings`, prevent that
         while placement_attempts < 10:
             placement_attempts += 1
             if any(new_building.intersects(other_room) for other_room in buildings):
                 continue
             for by in range(schematic_h):
                 for bx in range(schematic_w):
-                    print(f"{bx}, {by}")
                     if new_building.schematic[by][bx] == "#":
                         area.tiles[bx + x][y + by] = tile_types.wall
+                    if new_building.schematic[by][bx] == "D":
+                        # area.tiles[bx + x][y + by].
+                        door = copy.deepcopy(entity_factories.door)
+                        door_x = x+bx
+                        door_y = y+by
+                        door.spawn(area, door_x, door_y)
+                        area.tiles["transparent"][door_x][door_y] = False
             break
-
-
 
         buildings.append(new_building)
     print(f"Created {len(buildings)} buildings")

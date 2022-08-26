@@ -95,3 +95,7 @@ leather_jacket = Item(
 pants = Item(
     char="$", color=(139, 69, 19), name="Ragged Pants", equippable=equippable.Pants()
 )
+
+door = Item (
+    char="#", name='Door', blocks_movement=True, color=(139, 69, 19)
+)

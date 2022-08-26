@@ -1,7 +1,8 @@
 from __future__ import annotations
 import copy
 import math
-from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
+# from entity_factories import pants
+from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union, List
 from render_order import RenderOrder
 from namegen import NameGenerator
 if TYPE_CHECKING:
@@ -49,13 +50,21 @@ class Entity:
     def gamemap(self) -> GameMap:
         return self.parent.gamemap
 
-    def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
+    def spawn(self: T, gamemap: GameMap, x: int, y: int, spawn_items: List[Item] = []) -> T:
        """Spawn a copy of this instance at the given location."""
        clone = copy.deepcopy(self)
        clone.x = x
        clone.y = y
        clone.parent = gamemap
        gamemap.entities.add(clone)
+       if isinstance(self, Actor):
+            for i in spawn_items:
+                if i.equippable:
+                    equippable_item = copy.deepcopy(i)
+                    equippable_item.parent = clone.inventory
+                    clone.inventory.items.append(equippable_item)
+                    clone.equipment.toggle_equip(equippable_item)
+            clone.initialize()
        return clone 
     
     def place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> None:
@@ -139,6 +148,9 @@ class Actor(Entity):
         self.last_name: str = NameGenerator.get_last_name()
         full_name = f"{self.first_name} {self.last_name}"
         self.name = full_name
+        print(self.equipment.worn_articles)
+
+
 
 class Item(Entity):
     def __init__(
