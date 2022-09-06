@@ -1,0 +1,5 @@
+ticks
+
+each action takes at least 1 tick
+
+the effect of an action happens on its last tick

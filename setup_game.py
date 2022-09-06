@@ -13,13 +13,15 @@ from game_map import GameWorld
 import input_handlers
 from time_cycles import TimeCycle
 from namegen import NameGenerator
+from game_settings import GameConfig
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
 def new_game() -> Engine:
+    GameConfig.load_config_json()
     """Return a brand new game session as an Engine instance."""
-    map_width = 80
-    map_height = 43
+    map_width = GameConfig.map_width
+    map_height = GameConfig.map_height
 
     room_max_size = 10
     room_min_size = 6

@@ -10,9 +10,10 @@ if TYPE_CHECKING:
     from components.body import BodyPart, BodyPartTypes
 
 class Action:
-    def __init__(self, entity: Actor) -> None:
+    def __init__(self, entity: Actor, ticks = 1) -> None:
         super().__init__()
         self.entity = entity
+        self.ticks = ticks
 
     @property
     def engine(self) -> Engine:
@@ -30,7 +31,7 @@ class Action:
 class PickupAction(Action):
     """Pickup an item and add it to the inventory, if there is room for it."""
 
-    def __init__(self, entity: Actor):
+    def __init__(self, entity: Actor, ticks : 1):
         super().__init__(entity)
 
     def perform(self) -> None:

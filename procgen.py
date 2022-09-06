@@ -74,6 +74,9 @@ odd_house = [
 ]
 
 building_schematics = [house, big_house, odd_house]
+
+building_plot_size = 10
+
 def get_max_value_for_floor(
     max_value_by_floor: List[Tuple[int, int]], floor: int
 ) -> int:
