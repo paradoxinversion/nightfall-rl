@@ -31,7 +31,7 @@ class Action:
 class PickupAction(Action):
     """Pickup an item and add it to the inventory, if there is room for it."""
 
-    def __init__(self, entity: Actor, ticks : 1):
+    def __init__(self, entity: Actor):
         super().__init__(entity)
 
     def perform(self) -> None:
