@@ -1,7 +1,6 @@
 from __future__ import annotations
 from enum import Enum
 from typing import Dict, Tuple, List, TYPE_CHECKING
-from xml.sax.handler import property_interning_dict
 from components.base_component import BaseComponent
 from copy import deepcopy
 if TYPE_CHECKING:
@@ -16,7 +15,7 @@ class BodyPartTypes(Enum):
 
 class BodyPart():
     parent: Body
-    def __init__(self, name: str, bodypart_type: BodyPartTypes, hp: int, max_damage_lethal=False, attacks=False):
+    def __init__(self, name: str, bodypart_type: BodyPartTypes, hp: int, max_damage_lethal=False, attacks=False, energy=100):
         self._name = name
         self._hp = hp
         self.max_hp = hp
@@ -25,6 +24,7 @@ class BodyPart():
         self._attacks = attacks
         self.worn_article = None
         self.held_object = None
+        self.energy = energy
 
     @property
     def name(self) -> str:
@@ -76,6 +76,7 @@ class BodyPart():
         # If the body has taken lethal damage, the entity should die
         if self._hp <= 0 and self.max_damage_lethal == True:
             self.actor.fighter.die()
+
     @property
     def can_attack(self):
         if self.attacks == False:
@@ -151,13 +152,13 @@ class Body(BaseComponent):
         return body_parts
 
     @property
-    def dangerous_body_parts(self) -> List[BodyPart]:
+    def usable_body_parts(self) -> List[BodyPart]:
         """Returns a list of body parts this character is capable of attacking with"""
-        dbp = []
+        usable_part = []
         for body_part in self.body_parts.values():
             if body_part.can_attack:
-                dbp.append(body_part)
-        return dbp
+                usable_part.append(body_part)
+        return usable_part
 
     def get_parts_of_type(self, part_type: BodyPartTypes) -> List[BodyPart]:
         """Returns a list of body parts that match a given part_type"""

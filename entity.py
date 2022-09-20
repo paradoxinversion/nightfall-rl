@@ -38,14 +38,22 @@ class Entity:
         self.y = y
         self.char = char
         self.color = color
-        self.name = name
+        self._name = name
         self.blocks_movement = blocks_movement
         self.render_order = render_order
         if parent:
             # If parent isn't provided now then it will be set later.
             self.parent = parent
             parent.entities.add(self)
+    @property
+    def name(self):
+        """The entity's name"""
+        return self._name
 
+    @name.setter
+    def name(self, name) -> str:
+        self._name = name
+        
     @property
     def gamemap(self) -> GameMap:
         return self.parent.gamemap
@@ -147,10 +155,7 @@ class Actor(Entity):
         self.first_name: str = NameGenerator.get_first_name()
         self.last_name: str = NameGenerator.get_last_name()
         full_name = f"{self.first_name} {self.last_name}"
-        self.name = full_name
-        print(self.equipment.worn_articles)
-
-
+        self._name = full_name
 
 class Item(Entity):
     def __init__(

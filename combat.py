@@ -4,11 +4,12 @@ from typing import TYPE_CHECKING, Dict
 import color
 import random
 from entity import Actor
+from components.body import BodyPartTypes
 if TYPE_CHECKING:
     from engine import Engine
-    from components.body import BodyPart
+    from components.body import BodyPart, BodyPartTypes
 
-class Attack():
+class _Attack():
     """A basic attack class"""
     @staticmethod
     def attack(engine: Engine, attacker: Actor, target: Actor):
@@ -41,6 +42,23 @@ class Attack():
             attack_desc = f"{attacker.name.capitalize()} attacks {target.name}'s {target_body_part.name} with a {attack_name}, dealing {damage} damage!"
             engine.message_log.add_message(attack_desc, attack_color)
             target_body_part.take_damage(damage)
+class Attack():
+    def __init__(self, name, body_part, damage) -> None:
+        self._name = name
+        self._damage = damage
+        self._body_part = body_part
+    
+    @property
+    def name(self):
+        """The name of the attack"""
+        return self._name
+
+attackTypes = {
+    BodyPartTypes.ARM: [Attack(name="punch",body_part=BodyPartTypes.ARM, damage=5),],
+    BodyPartTypes.LEG: [Attack(name="kick",body_part=BodyPartTypes.LEG, damage=5),]
+}
+
+
 
 attack_templates = {
     "arm": {

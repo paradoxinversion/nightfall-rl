@@ -3,7 +3,10 @@ from typing import TYPE_CHECKING
 import color
 from components.base_component import BaseComponent
 from render_order import RenderOrder
-
+import exceptions
+import random
+from combat import Attack, attackTypes
+import components.ai
 if TYPE_CHECKING:
     from entity import Actor
 
@@ -14,6 +17,7 @@ class Fighter(BaseComponent):
         self._hp = hp
         self.base_defense = base_defense
         self.base_power = base_power
+        self.previous_target = None
 
     @property
     def hp(self) -> int:
@@ -62,6 +66,28 @@ class Fighter(BaseComponent):
         self.parent.render_order = RenderOrder.CORPSE
         self.engine.message_log.add_message(death_message, death_message_color)
         self.engine.player.level.add_xp(self.parent.level.xp_given)
+
+    def attack(self, target: Actor):
+        if not target:
+            raise exceptions.Impossible("Nothing to attack.")
+        # Get usable body part
+        usable_body_parts = self.parent.body.usable_body_parts
+        if usable_body_parts.__len__() == 0:
+            msg = f"{self.parent.name} tries to attack, but is unable!"
+            self.engine.message_log.add_message(msg)
+        else:
+            attacking_part = random.choice(usable_body_parts)
+            attack = random.choice(attackTypes.get(attacking_part.bodypart_type))
+            # choose an enemy's body part
+            target_part = random.choice(target.body.targetable_body_parts)
+            msg = f"{self.parent.name} attacks {target.name}'s {target_part.name} with {attack.name}"
+            print(msg)
+            # deal dmg
+            target_part.take_damage(attack._damage)
+            self.engine.message_log.add_message(msg)
+
+            target.ai = components.ai.HostileEnemy(entity=target)
+            self.previous_target = target
 
     def heal(self, amount: int) -> int:
         if self.hp == self.max_hp:

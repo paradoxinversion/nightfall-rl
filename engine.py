@@ -4,6 +4,7 @@ import pickle
 from typing import TYPE_CHECKING
 from tcod.console import Console
 from tcod.map import compute_fov
+from tcod import FOV_DIAMOND
 import exceptions
 from message_log import MessageLog
 from time_cycles import TimeCycle, NIGHT_FOV_RANGE
@@ -59,6 +60,7 @@ class Engine:
             self.game_map.tiles["transparent"],
             (self.player.x, self.player.y),
             radius=int(self.current_fov_radius),
+            algorithm=FOV_DIAMOND
         )
         # If a tile is "visible" it should be added to "explored".
         self.game_map.explored |= self.game_map.visible

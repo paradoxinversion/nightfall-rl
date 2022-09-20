@@ -3,7 +3,7 @@ from typing import Optional, Tuple, List, TYPE_CHECKING
 import color
 import exceptions
 import random
-from combat import Attack
+from combat import Attack, attackTypes
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Actor, Entity, Item
@@ -130,11 +130,8 @@ class ActionWithDirection(Action):
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
         target = self.target_actor
-        if not target:
-            raise exceptions.Impossible("Nothing to attack.")
-        body_target = random.choice(list(target.body.body_parts.values()))
-        damage = self.entity.fighter.power - target.fighter.defense
-        Attack.attack(engine=self.engine, attacker=self.entity, target=target)
+        self.entity.fighter.attack(target)
+
 
 class MovementAction(ActionWithDirection):
     def perform(self) -> None:
@@ -157,8 +154,8 @@ class MovementAction(ActionWithDirection):
 
 class BumpAction(ActionWithDirection):
     def perform(self) -> None:
-        if self.target_actor:
-            return MeleeAction(self.entity, self.dx, self.dy).perform()
-
-        else:
-            return MovementAction(self.entity, self.dx, self.dy).perform()
+        # if self.target_actor:
+        #     return MeleeAction(self.entity, self.dx, self.dy).perform()
+        # else:
+        #     return MovementAction(self.entity, self.dx, self.dy).perform()
+         return MovementAction(self.entity, self.dx, self.dy).perform()

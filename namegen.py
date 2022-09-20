@@ -14,20 +14,20 @@ class NameGenerator():
         afab_names_raw = afab_names.readlines()
         afab_names = []
         for name in afab_names_raw:
-            afab_names.append(str.capitalize(name))
+            afab_names.append(str.capitalize(name).strip())
         NameGenerator.afab_names = afab_names
         amab_names = open('gen_sources/names/first/amab.txt', 'r')
         amab_names_raw = amab_names.readlines()
         amab_names = []
         for name in amab_names_raw:
-            amab_names.append(str.capitalize(name))
+            amab_names.append(str.capitalize(name).strip())
         NameGenerator.amab_names = amab_names
         
         last_names = open('gen_sources/names/last.txt', 'r')
         last_names_raw = last_names.readlines()
         last_names = []
         for name in last_names_raw:
-            last_names.append(str.capitalize(name))
+            last_names.append(str.capitalize(name).strip())
         NameGenerator.last_names = last_names
 
         total_names += len(last_names)
