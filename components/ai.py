@@ -40,7 +40,28 @@ class BaseAI(Action):
 
         # Convert from List[List[int]] to List[Tuple[int, int]].
         return [(index[0], index[1]) for index in path]
+class WanderingAI(BaseAI):
+    """A wandering enemy will rander aimlessly until their AI type changes"""
+    def __init__(
+        self, entity: Actor, previous_ai: Optional[BaseAI], turns_remaining: int
+    ):
+        super().__init__(entity)
 
+        self.previous_ai = previous_ai
+    def perform(self) -> None:
+        direction_x, direction_y = random.choice(
+            [
+                (-1, -1),  # Northwest
+                (0, -1),  # North
+                (1, -1),  # Northeast
+                (-1, 0),  # West
+                (1, 0),  # East
+                (-1, 1),  # Southwest
+                (0, 1),  # South
+                (1, 1),  # Southeast
+            ]
+        )
+        return BumpAction(self.entity, direction_x, direction_y,).perform()
 class ConfusedEnemy(BaseAI):
     """
     A confused enemy will stumble around aimlessly for a given number of turns, then revert back to its previous AI.
@@ -112,9 +133,25 @@ class NPC(BaseAI):
     def __init__(self, entity: Actor):
         super().__init__(entity)
         self.path: List[Tuple[int, int]] = []
+        self.current_action = "Nothing"
 
     def perform(self) -> None:
-        pass
+        self.current_action = "Wandering"
+        direction_x, direction_y = random.choice(
+            [
+                (-1, -1),  # Northwest
+                (0, -1),  # North
+                (1, -1),  # Northeast
+                (-1, 0),  # West
+                (1, 0),  # East
+                (-1, 1),  # Southwest
+                (0, 1),  # South
+                (1, 1),  # Southeast
+            ]
+        )
+
+        return BumpAction(self.entity, direction_x, direction_y, False).perform()
+        
         # target = self.engine.player
         # dx = target.x - self.entity.x
         # dy = target.y - self.entity.y

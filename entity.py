@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from components.level import Level
     from components.body import Body
     from game_map import GameMap
+    from building import Building
 
 T = TypeVar("T", bound="Entity")
 
@@ -74,7 +75,7 @@ class Entity:
                     clone.equipment.toggle_equip(equippable_item)
             clone.initialize()
        return clone 
-    
+
     def place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> None:
         """Place this entity at a new location.  Handles moving across GameMaps."""
         self.x = x
@@ -144,7 +145,9 @@ class Actor(Entity):
         self.inventory.parent = self
 
         self.level: Level = level
-        self.level.parent = self    
+        self.level.parent = self 
+        self.owned_building: Building = None
+   
         print ("Created Actor")   
         
     @property
