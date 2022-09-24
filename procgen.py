@@ -8,6 +8,7 @@ from game_map import GameMap
 import tile_types
 from entity import Actor
 from building import Building, BuildingType
+from generators.equipment import generate_pants
 if TYPE_CHECKING:
    from engine import Engine
    from entity import Entity, Actor
@@ -190,7 +191,7 @@ def place_actors(area: GameMap) -> None:
             # Spawn entity here
             actor: Entity = entity_factories.person
             x,y = building.center
-            actor.spawn(area, x, y, [entity_factories.pants])
+            actor.spawn(area, x, y, [generate_pants()])
 
 def place_entities_area(area_map: GameMap) -> None:
     number_of_items = random.randint(

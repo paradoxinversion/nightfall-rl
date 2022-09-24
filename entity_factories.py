@@ -6,6 +6,8 @@ from components.inventory import Inventory
 from components.level import Level
 from components.body import Body
 from entity import Actor, Item
+from enum import Enum
+import random
 
 player = Actor(
     char="@",

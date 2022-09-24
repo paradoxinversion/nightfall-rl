@@ -14,6 +14,7 @@ import input_handlers
 from time_cycles import TimeCycle
 from namegen import NameGenerator
 from game_settings import GameConfig
+from generators.equipment import generate_pants, generate_jacket, generate_weapon
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
@@ -53,9 +54,13 @@ def new_game() -> Engine:
         "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
     player.parent = engine.game_map
-    dagger = copy.deepcopy(entity_factories.dagger)
-    leather_jacket = copy.deepcopy(entity_factories.leather_jacket)
-    pants = copy.deepcopy(entity_factories.pants)
+    # dagger = copy.deepcopy(entity_factories.dagger)
+    dagger = generate_weapon()
+    # leather_jacket = copy.deepcopy(entity_factories.leather_jacket)
+    leather_jacket = generate_jacket()
+    # pants = copy.deepcopy(entity_factories.pants)
+    pants = copy.deepcopy(generate_pants())
+
 
     dagger.parent = player.inventory
     leather_jacket.parent = player.inventory
@@ -84,7 +89,7 @@ class MainMenu(input_handlers.BaseEventHandler):
     NameGenerator.load_names()
     def on_render(self, console: tcod.Console) -> None:
         """Render the main menu on a background image."""
-        console.draw_semigraphics(background_image, 0, 0)
+        # console.draw_semigraphics(background_image, 0, 0)
 
         console.print(
             console.width // 2,
