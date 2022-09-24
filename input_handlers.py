@@ -58,7 +58,8 @@ CONFIRM_KEYS = {
     tcod.event.K_RETURN,
     tcod.event.K_KP_ENTER,
 }
-
+from game_settings import GameConfig
+config = GameConfig.load_config_json()
 ActionOrHandler = Union[Action, "BaseEventHandler"]
 """An event handler return value which can trigger an action or switch active handlers.
 
@@ -303,7 +304,10 @@ class MainGameEventHandler(EventHandler):
 
         if key in MOVE_KEYS:
             dx, dy = MOVE_KEYS[key]
-            action = BumpAction(player, dx, dy)
+            force_attack = False
+            if event.mod & (tcod.event.KMOD_LSHIFT | tcod.event.KMOD_RSHIFT):
+                force_attack = True
+            action = BumpAction(entity=player, dx=dx, dy=dy, force_attack=force_attack)
             self.engine.time_cycle.tick()
         elif key in WAIT_KEYS:
             action = WaitAction(player)
@@ -405,63 +409,58 @@ class CharacterScreenEventHandler(AskUserEventHandler):
     def on_render(self, console: tcod.Console) -> None:
         super().on_render(console)
 
-        if self.engine.player.x <= 30:
-            x = 40
-        else:
-            x = 0
-
+        x = 0
         y = 0
-
-        width = len(self.TITLE) + 4
+        width = int(config["game"]["map"]["width"] / 2)
+        height = 30
 
         console.draw_frame(
             x=x,
             y=y,
             width=width,
-            height=7,
+            height=height,
             title=self.TITLE,
             clear=True,
             fg=(255, 255, 255),
             bg=(0, 0, 0),
         )
+        player = self.engine.player
+        pos_y = y
 
-        console.print(
-            x=x + 1, y=y + 1, string=f"Level: {self.engine.player.level.current_level}"
-        )
-        console.print(
-            x=x + 1, y=y + 2, string=f"XP: {self.engine.player.level.current_xp}"
-        )
-        console.print(
-            x=x + 1,
-            y=y + 3,
-            string=f"XP for next Level: {self.engine.player.level.experience_to_next_level}",
-        )
+        vital_section = [
+            "---Vitals---",
+            f"Name: {player.name}",
+            f"Level: {player.level.current_level}",
+            f"XP: {player.level.current_xp}",
+            f"XP for next Level: {player.level.experience_to_next_level}"
+        ]
 
-        console.print(
-            x=x + 1, y=y + 4, string=f"Attack: {self.engine.player.fighter.power}"
-        )
-        console.print(
-            x=x + 1, y=y + 5, string=f"Defense: {self.engine.player.fighter.defense}"
-        )
-        total_hp = 0
-        for part in self.engine.player.body.body_parts.values():
-            total_hp += part.hp
+        for field in vital_section:
+            console.print(
+                x=x + 1, y=pos_y + 1, string=field
+            )
+            pos_y= pos_y + 1
 
-        console.print(
-            x=x + 1, y=y + 6, string=f"Body: {self.engine.player.body.current_hp}/{self.engine.player.body.total_hp}"
-        )
-
-        # Body Info
-        bp_rows_start = y + 7
-        bp_row = 0
         for body_part in self.engine.player.body.body_parts.values():
             equipped_items = body_part.equipped_items
             worn = "" if equipped_items[0] == None else equipped_items[0].name
             held = "" if equipped_items[1] == None else equipped_items[1].name
             console.print(
-                x=x + 1, y=bp_rows_start + bp_row, string=f"{body_part.name} | {body_part.hp}HP | {worn} | {held}"
+                x=x + 1, y=pos_y + 1, string=f"{body_part.name} | {body_part.hp}HP | {worn} | {held}"
             )
-            bp_row=bp_row+1
+            pos_y=pos_y+1
+        combat_section = [
+            "---Combat---",
+            f"Health Points: {player.body.current_hp}/{player.body.total_hp}",
+            f"Attack: {player.fighter.power}",
+            f"Defense: {player.fighter.defense}"
+        ]
+        for field in combat_section:
+            console.print(
+                x=x + 1, y=pos_y + 1, string=field
+            )
+            pos_y= pos_y + 1
+
 
 class LevelUpEventHandler(AskUserEventHandler):
     TITLE = "Level Up"

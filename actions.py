@@ -106,11 +106,12 @@ class TakeStairsAction(Action):
             raise exceptions.Impossible("There are no stairs here.")
 
 class ActionWithDirection(Action):
-    def __init__(self, entity: Actor, dx: int, dy: int):
+    def __init__(self, entity: Actor, dx: int, dy: int, force_attack: bool):
         super().__init__(entity)
 
         self.dx = dx
         self.dy = dy
+        self.force_attack = force_attack
     @property
     def dest_xy(self) -> Tuple[int, int]:
         """Returns this actions destination."""
@@ -149,7 +150,7 @@ class MovementAction(ActionWithDirection):
                 blocking_entity.blocks_movement = False
                 blocking_entity.char = ""
             # Destination is blocked by an entity.
-            raise exceptions.Impossible("That way is blocked.")
+            raise exceptions.Impossible("That way is blocked by someething..")
         self.entity.move(self.dx, self.dy)
 
 class BumpAction(ActionWithDirection):
@@ -158,4 +159,8 @@ class BumpAction(ActionWithDirection):
         #     return MeleeAction(self.entity, self.dx, self.dy).perform()
         # else:
         #     return MovementAction(self.entity, self.dx, self.dy).perform()
-         return MovementAction(self.entity, self.dx, self.dy).perform()
+        if self.target_actor:
+            if self.force_attack:
+                return MeleeAction(self.entity, self.dx, self.dy, self.force_attack).perform()
+        else:
+            return MovementAction(self.entity, self.dx, self.dy, self.force_attack).perform()
