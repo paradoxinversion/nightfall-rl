@@ -18,10 +18,10 @@ from game_settings import GameConfig
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
 def new_game() -> Engine:
-    GameConfig.load_config_json()
     """Return a brand new game session as an Engine instance."""
-    map_width = GameConfig.map_width
-    map_height = GameConfig.map_height
+    config = GameConfig.load_config_json()
+    map_width = config["game"]["map"]["width"]
+    map_height = config["game"]["map"]["height"]
 
     room_max_size = 10
     room_min_size = 6
@@ -29,10 +29,11 @@ def new_game() -> Engine:
 
     player = copy.deepcopy(entity_factories.player)
     time_cycle = TimeCycle(
-        phase_ticks_dawn = 50, 
-        phase_ticks_daytime=200, 
-        phase_ticks_dusk=50, 
-        phase_ticks_nighttime= 200)
+        phase_ticks_dawn = config["game"]["time_cycles"]["phase_ticks_dawn"], 
+        phase_ticks_daytime = config["game"]["time_cycles"]["phase_ticks_daytime"], 
+        phase_ticks_dusk = config["game"]["time_cycles"]["phase_ticks_dusk"],
+        phase_ticks_nighttime = config["game"]["time_cycles"]["phase_ticks_nighttime"]
+    )
 
     engine = Engine(player=player, time_cycle=time_cycle)
 

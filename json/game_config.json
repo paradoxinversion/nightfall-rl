@@ -1,4 +1,18 @@
 {
-    "map_width": 80,
-    "map_height": 43
+    "window":{
+        "width": 80,
+        "height": 50
+    },
+    "game": {
+        "map": {
+            "width": 80,
+            "height": 43
+        },
+        "time_cycles": {
+            "phase_ticks_dawn": 50, 
+            "phase_ticks_daytime": 200, 
+            "phase_ticks_dusk": 50, 
+            "phase_ticks_nighttime": 200
+        }
+    }
 }

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import traceback
+from typing import Dict
 import tcod
 import color
 import exceptions
 import input_handlers
 import setup_game
+from game_settings import GameConfig
 
 def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
     """If the current event handler has an active Engine then save it."""
@@ -13,8 +15,9 @@ def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
         print("Game saved.")
 
 def main() -> None:
-    screen_width = 80
-    screen_height = 50
+    config: Dict = GameConfig.load_config_json()
+    screen_width = config["window"]["width"]
+    screen_height = config["window"]["height"]
     tileset = tcod.tileset.load_tilesheet(
         "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
     )

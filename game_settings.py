@@ -5,7 +5,9 @@ class GameConfig():
     map_height: int = 43
 
     def load_config_json():
-        f = open("json/game_config.json", "r")
-        for x in f.readlines():
-            print(x)
-            # print(f"{f.readline()}")
+        with open("json/game_config.json", "r") as settings_file:
+            data = json.load(settings_file)
+            for key in data.keys():
+                print(f"{key}: {data[key]}")
+            
+            return data
