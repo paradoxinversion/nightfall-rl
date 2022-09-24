@@ -144,7 +144,8 @@ class Actor(Entity):
         self.inventory.parent = self
 
         self.level: Level = level
-        self.level.parent = self        
+        self.level.parent = self    
+        print ("Created Actor")   
         
     @property
     def is_alive(self) -> bool:
@@ -156,6 +157,7 @@ class Actor(Entity):
         self.last_name: str = NameGenerator.get_last_name()
         full_name = f"{self.first_name} {self.last_name}"
         self._name = full_name
+        print (f"Initialized Character - {self._name} at {self.x},{self.y}") 
 
 class Item(Entity):
     def __init__(

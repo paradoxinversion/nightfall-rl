@@ -280,7 +280,7 @@ def generate_dungeon(
 
   return dungeon
 
-def generate_area_map(
+def _generate_area_map(
    map_width: int,
    map_height: int,
    engine: Engine,
@@ -295,6 +295,8 @@ def generate_area_map(
 
     max_buildings = 10
     player.place(5, 5, area)
+
+
     for b in range(max_buildings):
         schematic = random.choice(list(building_schematics))
         schematic_h = len(schematic)
@@ -321,6 +323,75 @@ def generate_area_map(
             buildings.append(new_building)
             break
 
+    print(f"Created {len(buildings)} buildings")
+    area.buildings = buildings
+    place_actors(area)
+    return area
+
+def generate_area_map(
+   map_width: int,
+   map_height: int,
+   engine: Engine,
+#    max_buildings: int
+) -> GameMap:
+    """Generate a new area map."""
+    player = engine.player
+    area = GameMap(engine, map_width, map_height, entities=[player])
+    new_area = Area(map_width, map_height)
+    area.tiles[new_area.inner()] = tile_types.floor
+    buildings: List[Building] = []
+
+    max_buildings = 10
+    player.place(5, 5, area)
+
+    # each building is on a plot that has a square size
+    standard_plot = 12 #for now, every plot is this size
+    #figure out how many plots fit on the map
+
+    horizontal_plots = int(map_width  / (standard_plot + 1) )
+    vertical_plots = int(map_height / (standard_plot + 1))
+    print(f"{horizontal_plots} {vertical_plots}")
+
+
+    # Set our starting point
+    plot_start_x = 1
+    plot_start_y = 1
+
+    # Create vertical and horizontal plots
+    # There should be 1 tile of space between each plot
+    for vp in range(vertical_plots):
+        for hp in range(horizontal_plots):
+            x = plot_start_x
+            y = plot_start_y
+            # Fill in the plot with grass tiles
+            # Mostly for debug purposes
+            # for by in range(standard_plot):
+            #         for bx in range(standard_plot):
+            #             area.tiles[bx + x][y + by] = tile_types.grass
+            
+            # Create a building at the bottom left of this plot
+            schematic = random.choice(list(building_schematics))
+            schematic_h = len(schematic)
+            schematic_w = len(schematic[0])
+            building_origin_x = plot_start_x
+            building_origin_y = plot_start_y
+            new_building = Building(building_origin_x, building_origin_y, schematic)
+            for by in range(schematic_h):
+                for bx in range(schematic_w):
+                    if new_building.schematic[by][bx] == "#":
+                        area.tiles[bx + building_origin_x][building_origin_y + by] = tile_types.wall
+                    if new_building.schematic[by][bx] == "D":
+                        door = copy.deepcopy(entity_factories.door)
+                        door_x = building_origin_x+bx
+                        door_y = building_origin_y+by
+                        door.spawn(area, door_x, door_y)
+                        area.tiles["transparent"][door_x][door_y] = False
+            buildings.append(new_building)
+            plot_start_x = 1 + ((standard_plot + 1) * hp + 1)
+            plot_start_y = 1 + ((standard_plot + 1) * vp + 1)
+
+        
+                    
     print(f"Created {len(buildings)} buildings")
     area.buildings = buildings
     place_actors(area)
