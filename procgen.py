@@ -187,16 +187,27 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
             if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
                 entity.spawn(dungeon, x, y)
 
-def place_actors(area: GameMap) -> None:
+# def place_actors(area_map: GameMap) -> None:
+#     # get houses
+#     for area in area_map.areas:
+#         for plot in area.plots:
+#             building = plot.building
+#             if building.building_type == BuildingType.HOUSE:
+#                 # Spawn entity here
+#                 actor: Entity = entity_factories.person
+#                 x,y = building.center
+#                 actor.spawn(area_map, x, y, [generate_pants()])
+#                 actor.owned_building = building
+def place_actors(area: Area) -> None:
     # get houses
-    for building in area.buildings:
+    for plot in area.plots:
+        building = plot.building
         if building.building_type == BuildingType.HOUSE:
             # Spawn entity here
             actor: Entity = entity_factories.person
             x,y = building.center
-            actor.spawn(area, x, y, [generate_pants()])
+            actor.spawn(area._game_map, x, y, [generate_pants()])
             actor.owned_building = building
-
 def place_entities_area(area_map: GameMap) -> None:
     number_of_items = random.randint(
         0, get_max_value_for_floor(max_items_by_floor, 1)
@@ -412,5 +423,6 @@ def generate_area_map(
     area_map.buildings = buildings
     new_area.buildings = buildings
     new_area.plots = plots
-    place_actors(area_map)
+    new_area._game_map = area_map
+    place_actors(new_area)
     return area_map
