@@ -187,17 +187,6 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
             if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
                 entity.spawn(dungeon, x, y)
 
-# def place_actors(area_map: GameMap) -> None:
-#     # get houses
-#     for area in area_map.areas:
-#         for plot in area.plots:
-#             building = plot.building
-#             if building.building_type == BuildingType.HOUSE:
-#                 # Spawn entity here
-#                 actor: Entity = entity_factories.person
-#                 x,y = building.center
-#                 actor.spawn(area_map, x, y, [generate_pants()])
-#                 actor.owned_building = building
 def place_actors(area: Area) -> None:
     # get houses
     for plot in area.plots:
