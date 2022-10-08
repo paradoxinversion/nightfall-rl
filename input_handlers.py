@@ -16,7 +16,7 @@ import exceptions
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entity import Item
+    from entity import Item, Actor
 
 MOVE_KEYS = {
     # Arrow keys.
@@ -58,8 +58,10 @@ CONFIRM_KEYS = {
     tcod.event.K_RETURN,
     tcod.event.K_KP_ENTER,
 }
+
 from game_settings import GameConfig
 config = GameConfig.load_config_json()
+
 ActionOrHandler = Union[Action, "BaseEventHandler"]
 """An event handler return value which can trigger an action or switch active handlers.
 
@@ -237,11 +239,24 @@ class SelectIndexHandler(AskUserEventHandler):
         """Called when an index is selected."""
         raise NotImplementedError()
 
+class ContextClickHandler(SelectIndexHandler):
+    """Show a contextual menu when they click on a object"""
+
+    def on_index_selected(self, x: int, y: int) -> Optional[ActionOrHandler]:
+        # return super().on_index_selected(x, y)
+        print(x, y)
+        actor = self.engine.game_map.get_actor_at_location(x, y)
+        if actor:
+            return ConversationHandler(self.engine, actor)
+        else:
+            return MainGameEventHandler(self.engine)
+
 class LookHandler(SelectIndexHandler):
     """Lets the player look around using the keyboard."""
 
     def on_index_selected(self, x: int, y: int) -> MainGameEventHandler:
         """Return to main handler."""
+        print('t')
         return MainGameEventHandler(self.engine)
 
 class SingleRangedAttackHandler(SelectIndexHandler):
@@ -328,6 +343,8 @@ class MainGameEventHandler(EventHandler):
             return CharacterScreenEventHandler(self.engine)
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
+        elif key == tcod.event.K_t:
+            return ContextClickHandler(self.engine)
         # No valid key was pressed
         return action
 
@@ -626,3 +643,48 @@ class InventoryDropHandler(InventoryEventHandler):
     def on_item_selected(self, item: Item) -> Optional[ActionOrHandler]:
         """Drop this item."""
         return actions.DropItem(self.engine.player, item)
+
+class ConversationHandler(AskUserEventHandler):
+    def __init__(self, engine: Engine, actor: Actor):
+        self.current_message = ""
+        self.target_actor=actor
+        super().__init__(engine)
+    
+    def on_render(self, console: tcod.console):
+        super().on_render(console)
+
+        console.draw_frame(
+            x=0,
+            y=0,
+            width=config["window"]["width"],
+            height=int(config["window"]["height"]),
+            title="A Conversation",
+            clear=True,
+            fg=(255, 255, 255),
+            bg=(0, 0, 0),
+        )
+
+        console.draw_frame(
+            x=2,
+            y=2,
+            width=config["window"]["width"]-4,
+            height=int(config["window"]["height"]/2),
+            clear=True,
+            title=self.target_actor.name,
+            fg=(255, 255, 255),
+            bg=(0, 0, 0),
+        )
+
+        command_area_y = int(config["window"]["height"]/2) + 2
+        console.print(2, command_area_y, "A) Name")
+        console.print(3, command_area_y, "B) Rumors")
+        console.print(4, 4, self.current_message)
+
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
+        key = event.sym
+        index = key - tcod.event.K_a
+      
+        if index == 0:
+            self.current_message = f"My name is {self.target_actor.name}."
+
+        # return super().ev_keydown(event)
