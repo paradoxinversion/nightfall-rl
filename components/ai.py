@@ -37,7 +37,6 @@ class BaseAI(Action):
 
         # Compute the path to the destination and remove the starting point.
         path: List[List[int]] = pathfinder.path_to((dest_x, dest_y))[1:].tolist()
-
         # Convert from List[List[int]] to List[Tuple[int, int]].
         return [(index[0], index[1]) for index in path]
 class WanderingAI(BaseAI):
@@ -135,38 +134,37 @@ class NPC(BaseAI):
         self.path: List[Tuple[int, int]] = []
         self.current_action = "Nothing"
 
+    def go_to_location(self, x, y) -> None:
+        self.current_action = "moving to location"
+        self.path = self.get_path_to(x, y)
+        if len(self.path) > 0:
+            dest_x, dest_y = self.path.pop(0)
+            return MovementAction(
+                self.entity, dest_x - self.entity.x, dest_y - self.entity.y, False
+            ).perform()
+    def go_home(self):
+        if (self.entity.owned_building):
+            self.go_to_location(self.entity.owned_building.x, self.entity.y)
+
+
     def perform(self) -> None:
         self.current_action = "Wandering"
-        direction_x, direction_y = random.choice(
-            [
-                (-1, -1),  # Northwest
-                (0, -1),  # North
-                (1, -1),  # Northeast
-                (-1, 0),  # West
-                (1, 0),  # East
-                (-1, 1),  # Southwest
-                (0, 1),  # South
-                (1, 1),  # Southeast
-            ]
-        )
+        if self.engine.time_cycle._current_phase == 1:
+            self.go_home()
+            # return BumpAction(self.entity, direction_x, direction_y, False).perform() 
+        else:
+            direction_x, direction_y = random.choice(
+                [
+                    (-1, -1),  # Northwest
+                    (0, -1),  # North
+                    (1, -1),  # Northeast
+                    (-1, 0),  # West
+                    (1, 0),  # East
+                    (-1, 1),  # Southwest
+                    (0, 1),  # South
+                    (1, 1),  # Southeast
+                ]
+            )
+            return BumpAction(self.entity, direction_x, direction_y, False).perform()
 
-        return BumpAction(self.entity, direction_x, direction_y, False).perform()
         
-        # target = self.engine.player
-        # dx = target.x - self.entity.x
-        # dy = target.y - self.entity.y
-        # distance = max(abs(dx), abs(dy))  # Chebyshev distance.
-
-        # if self.engine.game_map.visible[self.entity.x, self.entity.y]:
-        #     if distance <= 1:
-        #         return MeleeAction(self.entity, dx, dy).perform()
-
-        #     self.path = self.get_path_to(target.x, target.y)
-
-        # if self.path:
-        #     dest_x, dest_y = self.path.pop(0)
-        #     return MovementAction(
-        #         self.entity, dest_x - self.entity.x, dest_y - self.entity.y,
-        #     ).perform()
-
-        # return WaitAction(self.entity).perform()

@@ -6,5 +6,8 @@ Each turn of the game is (currently) the shortest unit of time: a tick. A day in
 
 As mentioned, each action currently takes one tick, whether it's using an item, attacking, waiting, moving, etc. Each action should take at least one tick, with more arduous ones (such as trying to force something open) taking more ticks than simple ones (taking a step).
 
+NPCs and Time
+At various times of the day, (most) NPCs will often go somewhere or do something. Before night time, citizens with homes will go home.
+
 Related Docs
 scripts/time_cycle.md

@@ -13,6 +13,13 @@ class BodyPartTypes(Enum):
     LEG = 3
     TAIL = 4
 
+class EyeColor(Enum):
+    BROWN = 0
+    GREEN = 1
+    BLUE = 2
+    AMBER = 3
+    HAZEL = 4
+
 class BodyPart():
     parent: Body
     def __init__(self, name: str, bodypart_type: BodyPartTypes, hp: int, max_damage_lethal=False, attacks=False, energy=100):
