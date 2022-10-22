@@ -15,10 +15,16 @@ from time_cycles import TimeCycle
 from namegen import NameGenerator
 from game_settings import GameConfig
 from generators.equipment import generate_pants, generate_jacket, generate_weapon
+import random
+from entity_factories import create_person
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
-def new_game() -> Engine:
+def new_game(
+    player_first_name,
+    player_last_name,
+    player_age
+) -> Engine:
     """Return a brand new game session as an Engine instance."""
     config = GameConfig.load_config_json()
     map_width = config["game"]["map"]["width"]
@@ -134,6 +140,106 @@ class MainMenu(input_handlers.BaseEventHandler):
                 traceback.print_exc()  # Print to stderr.
                 return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
         elif event.sym == tcod.event.K_n:
+            # return input_handlers.MainGameEventHandler(new_game())
+            return CharacterCreationMenu()
+
+        return None
+
+class CharacterCreationMenu(input_handlers.BaseEventHandler):
+    """A handler for the main menu, covering rendering and input."""
+    def __init__(self) -> None:
+        super().__init__()
+        self.player_character =  create_person()
+        self.player_character.initialize()
+        self.player_gender_options = ["male", "female", "nonbinary", "bigender"]
+        self.player_gender = random.choice(self.player_gender_options)
+        self.player_age = random.choice(range(18,50))
+        if (self.player_gender == "male"):
+            player_name_pool = NameGenerator.amab_names
+        elif (self.player_gender == "female"):
+            player_name_pool = NameGenerator.afab_names
+        else:
+            player_name_pool = NameGenerator.afab_names + NameGenerator.amab_names
+        self.player_first_name = random.choice(player_name_pool)
+        self.player_last_name = NameGenerator.get_last_name()
+        
+    def on_render(self, console: tcod.Console) -> None:
+        """Render the main menu on a background image."""
+        # console.draw_semigraphics(background_image, 0, 0)
+        console.print_frame(
+            x=0,
+            y=0,
+            width=console.width,
+            height=console.height
+        )
+        y_cursor = 1
+        with open("raw/character_creation/intro.txt") as intro_text:
+            intro_text_line = intro_text.read()
+            intro_height = console.print_box(
+                x=1,
+                y=y_cursor,
+                width=console.width - 1,
+                height=5,
+                string=intro_text_line
+            )
+            y_cursor = y_cursor + intro_height + 2
+
+
+        gender_height = console.print_box(
+                x=1,
+                y=y_cursor,
+                width=console.width - 1,
+                height=5,
+                string=f"You are {self.player_gender}"
+            )
+        y_cursor = y_cursor + gender_height + 2
+
+        name_prompt_height = console.print_box(
+            x=1,
+            y=y_cursor,
+            width=console.width - 1,
+            height=console.height,
+            string=f"Your name is {self.player_character.name}"
+        )
+
+        y_cursor = y_cursor + name_prompt_height + 2
+
+        age_height = console.print_box(
+            x=1,
+            y=y_cursor,
+            width=console.width - 1,
+            height=console.height,
+            string=f"You are {self.player_age} years old"
+        )
+        y_cursor = y_cursor + name_prompt_height + 2
+
+        continue_height = console.print_box(
+            x=1,
+            y=y_cursor,
+            width=console.width - 1,
+            height=console.height,
+            string=f"Press c to continue"
+        )
+
+    def ev_keydown(
+        self, event: tcod.event.KeyDown
+    ) -> Optional[input_handlers.BaseEventHandler]:
+        if event.sym in (tcod.event.K_q, tcod.event.K_ESCAPE):
+            raise SystemExit()
+        elif event.sym == tcod.event.K_c:
+            try:
+                return input_handlers.MainGameEventHandler(new_game(
+                    player_first_name=self.player_first_name,
+                    player_last_name=self.player_first_name, 
+                    player_age=self.player_age
+                    ))
+            except FileNotFoundError:
+                return input_handlers.PopupMessage(self, "No saved game to load.")
+            except Exception as exc:
+                traceback.print_exc()  # Print to stderr.
+                return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
+        elif event.sym == tcod.event.K_a:
             return input_handlers.MainGameEventHandler(new_game())
 
         return None
+
