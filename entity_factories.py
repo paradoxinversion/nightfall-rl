@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from components.ai import HostileEnemy, NPC
 from components import consumable, equippable
 from components.equipment import Equipment
@@ -7,7 +9,23 @@ from components.level import Level
 from components.body import Body
 from entity import Actor, Item
 from enum import Enum
-import random
+
+if TYPE_CHECKING:
+   from entity import Actor
+   
+def create_person() -> Actor:
+    person = Actor(
+        char="@",
+        color=(255, 255, 255),
+        ai_cls=NPC,
+        equipment=Equipment(),
+        fighter=Fighter(hp=30, base_defense=1, base_power=2),
+        inventory=Inventory(capacity=26),
+        level=Level(level_up_base=200),
+        body=Body(race="human")
+    )
+
+    return person
 
 player = Actor(
     char="@",
