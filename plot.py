@@ -42,4 +42,5 @@ class Plot:
             and self.y2 >= other.y
         )
     def set_building(self, building: Building):
+        """Set the building associated with/on the plot."""
         self.building = building
