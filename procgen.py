@@ -1,5 +1,6 @@
 from __future__ import annotations
 import copy
+import pdb
 import random
 from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING, Optional
 import tcod
@@ -187,16 +188,19 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
             if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
                 entity.spawn(dungeon, x, y)
 
-def place_actors(area: Area) -> None:
+def place_actors(area: Area) -> List[Actor]:
     # get houses
+    actors = []
     for plot in area.plots:
         building = plot.building
         if building.building_type == BuildingType.HOUSE:
             # Spawn entity here
-            actor: Entity = entity_factories.person
             x,y = building.center
-            actor.spawn(area._game_map, x, y, [generate_pants()])
+            actor: Actor = entity_factories.create_person().spawn(area._game_map, x, y, [generate_pants()])
             actor.owned_building = building
+            actors.append(actor)
+    return actors
+
 def place_entities_area(area_map: GameMap) -> None:
     number_of_items = random.randint(
         0, get_max_value_for_floor(max_items_by_floor, 1)
@@ -340,78 +344,104 @@ def generate_area_map(
 ) -> GameMap:
     """Generate a new area map."""
     player = engine.player
+
     area_map = GameMap(engine, map_width, map_height, entities=[player])
     new_area = Area(map_width, map_height, area_map)
+
+    # All tiles on the map start as floor tiles
     area_map.tiles[new_area.inner()] = tile_types.floor
+
     buildings: List[Building] = []
+
+    # All buildings will be on their own plots of land
     plots: List[Plot] = []
+
     # Player Placement
     player.place(5, 5, area_map)
 
     # each building is on a plot that has a square size
     standard_plot = 12 #for now, every plot is this size
 
-    horizontal_plots = int(map_width  / (standard_plot + 1) )
+    # Determine how many plots we can have horizontally and vertically
+    horizontal_plots = int(map_width  / (standard_plot + 1))
     vertical_plots = int(map_height / (standard_plot + 1))
 
     # Set our starting point
+    # Plots should start at least two tiles into the area map
     plot_start_x = 2
     plot_start_y = 2
 
     # Create vertical and horizontal plots
     # There should be 1 tile of space between each plot
-    for vp in range(vertical_plots):
-        for hp in range(horizontal_plots):
-            # Set this plot's top-right corner
-            x = plot_start_x
-            y = plot_start_y
+    # Plots are created in rows from top to bottom of the map
+    for vertical_plot in range(vertical_plots):
+        for horizontal_plot in range(horizontal_plots):
+            # Set this plot's origin (top-left corner)
+            plot_origin_x = plot_start_x
+            plot_origin_y = plot_start_y
 
-            print (f"Creating a new plot at {x} {y}")
             # Create the plot object
-            newPlot = Plot(x,y,standard_plot, standard_plot)
+            newPlot = Plot(
+                x=plot_origin_x,
+                y=plot_origin_y,
+                width=standard_plot,
+                height=standard_plot
+            )
+            print (f"Creating a new plot ({vertical_plot}/{horizontal_plot}) at ({newPlot.x}, {newPlot.y})")
            
             # Fill in the plot with grass tiles
             # Mostly for debug purposes
-            # for by in range(standard_plot):
-            #         for bx in range(standard_plot):
-            #             area.tiles[bx + x][y + by] = tile_types.grass
+            for schematic_tile_y in range(standard_plot):
+                    for schematic_tile_x in range(standard_plot):
+                        grass_tile_x = schematic_tile_x + plot_origin_x
+                        grass_tile_y = plot_origin_y + schematic_tile_y
+                        area_map.tiles[grass_tile_x][grass_tile_y] = tile_types.grass
             
-            # -- Create a building originating at the top-right of this plot
+            # -- Create a building originating at the top-left of this plot
             # Select the schematic, capture width and height
             schematic = random.choice(list(building_schematics))
             schematic_h = len(schematic)
             schematic_w = len(schematic[0])
 
-            # Set the building's origin to the plot's top-right corner
-            building_origin_x = plot_start_x
-            building_origin_y = plot_start_y
+            # Set the building's origin to the plot's origin
+            building_origin_x = plot_origin_x
+            building_origin_y = plot_origin_y
 
             # Create a new building object at this origin
             new_building = Building(building_origin_x, building_origin_y, schematic)
             newPlot.set_building(new_building)
-            for by in range(schematic_h):
-                for bx in range(schematic_w):
-                    if new_building.schematic[by][bx] == "#":
-                        area_map.tiles[bx + building_origin_x][building_origin_y + by] = tile_types.wall
-                    if new_building.schematic[by][bx] == "D":
+
+            # Build the building (ie, update tiles as needed)
+            # Building tiles are created in rows from top to bottom
+            for schematic_tile_y in range(schematic_h):
+                for schematic_tile_x in range(schematic_w):
+                    schematic_char = new_building.schematic[schematic_tile_y][schematic_tile_x]
+                    curr_tile_x = schematic_tile_x + building_origin_x
+                    curr_tile_y = building_origin_y + schematic_tile_y
+                    if schematic_char == "#":
+                        area_map.tiles[curr_tile_x][curr_tile_y] = tile_types.wall
+                    elif schematic_char == "D":
                         door = copy.deepcopy(entity_factories.door)
-                        door_x = building_origin_x+bx
-                        door_y = building_origin_y+by
+                        door_x = building_origin_x + schematic_tile_x
+                        door_y = building_origin_y + schematic_tile_y
                         door.spawn(area_map, door_x, door_y)
                         area_map.tiles["transparent"][door_x][door_y] = False
+
             buildings.append(new_building)
             plots.append(newPlot)
-            plot_start_x = 1 + ((standard_plot + 1) * hp + 1 )
-            plot_start_y = 1 + ((standard_plot + 1) * vp + 1)
-
-
-        
-                    
+            next_x = 1 + ((standard_plot + 1) * horizontal_plot + 1 )
+            plot_start_x = next_x
+            plot_start_y = 1 + ((standard_plot + 1) * vertical_plot + 1)
+  
     print(f"Created {len(buildings)} buildings")
     # This should be removed
     area_map.buildings = buildings
     new_area.buildings = buildings
     new_area.plots = plots
     new_area._game_map = area_map
-    place_actors(new_area)
+    actors = place_actors(new_area)
+    evil_actor = random.choice(actors)
+    evil_actor.color = (255, 0, 0)
+    evil_actor.evil = True
+    print(f"{evil_actor.name} is the murderer")
     return area_map
