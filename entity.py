@@ -114,7 +114,8 @@ class Actor(Entity):
         inventory: Inventory,
         level: Level,
         body: Body,
-        base_fov: int = 8
+        base_fov: int = 8,
+        evil: bool = False
     ):
         super().__init__(
             x=x,
@@ -147,9 +148,8 @@ class Actor(Entity):
         self.level: Level = level
         self.level.parent = self 
         self.owned_building: Building = None
-   
-        print ("Created Actor")   
-        
+        self.evil = False
+           
     @property
     def is_alive(self) -> bool:
         """Returns True as long as this actor can perform actions."""
