@@ -127,6 +127,9 @@ class EventHandler(BaseEventHandler):
                 return GameOverEventHandler(self.engine)
             elif self.engine.player.level.requires_level_up:
                 return LevelUpEventHandler(self.engine)
+            elif len(self.engine.game_map.get_evil_characters()) == 0:
+                
+                return EndgameEventHandler(self.engine)
             return MainGameEventHandler(self.engine)  # Return to the main handler.
         return self
 
@@ -362,6 +365,51 @@ class GameOverEventHandler(EventHandler):
         if event.sym == tcod.event.K_ESCAPE:
             self.on_quit()
 
+class EndgameEventHandler(EventHandler):
+    def on_render(self, console: tcod.Console) -> None:
+        super().on_render(console)
+        console.print(1, 1, "Endgame")
+        x = 0
+        y = 0
+        width = int(config["game"]["map"]["width"] / 2)
+        height = 30
+
+        console.draw_frame(
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+            title="Endgame",
+            clear=True,
+            fg=(255, 255, 255),
+            bg=(0, 0, 0),
+        )
+        end_string = "The world has been made safe."
+        end_string += f"You've slain {self.engine.player.deeds.evil_entities_slain} evil entities."
+        end_string += f"You've snuffed out {self.engine.player.deeds.characters_murdered} lives."
+
+        if self.engine.player.deeds.evil_entities_slain == 0:
+            end_string += "You did nothing to prevent the harm of despicable foes."
+        console.print_rect(
+            x=2,
+            y=2,
+            width=width-x,
+            height=height-y,
+            # string=f"The world has been made safe. You've slain {self.engine.player.deeds.evil_entities_slain} evil entities. You've snuffed out {self.engine.player.deeds.characters_murdered} lives."
+            string=end_string
+        )
+    def on_quit(self) -> None:
+        """Handle exiting out of a finished game."""
+        if os.path.exists("savegame.sav"):
+            os.remove("savegame.sav")  # Deletes the active save file.
+        raise exceptions.QuitWithoutSaving()  # Avoid saving a finished game.
+
+    def ev_quit(self, event: tcod.event.Quit) -> None:
+        self.on_quit()
+
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+        if event.sym == tcod.event.K_ESCAPE:
+            self.on_quit()
 
 CURSOR_Y_KEYS = {
     tcod.event.K_UP: -1,
