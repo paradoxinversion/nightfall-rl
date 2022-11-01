@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Dict, Tuple, List, TYPE_CHECKING
 from components.base_component import BaseComponent
 from copy import deepcopy
+import random
 if TYPE_CHECKING:
     from entity import Actor, Item
 
@@ -101,19 +102,19 @@ class BodyPart():
 
 class BT_Head(BodyPart):
     def __init__(self, name="Head") -> None:
-        super().__init__(name=name, bodypart_type=BodyPartTypes.HEAD, hp=20, max_damage_lethal=True, attacks=False)
+        super().__init__(name=name, bodypart_type=BodyPartTypes.HEAD, hp=random.randint(20,30), max_damage_lethal=True, attacks=False)
 
 class BT_Torso(BodyPart):
     def __init__(self, name="Torso") -> None:
-        super().__init__(name=name, bodypart_type=BodyPartTypes.TORSO, hp=30, max_damage_lethal=True, attacks=False)
+        super().__init__(name=name, bodypart_type=BodyPartTypes.TORSO, hp=random.randint(40,60), max_damage_lethal=True, attacks=False)
 
 class BT_Arm(BodyPart):
     def __init__(self, name="Arm") -> None:
-        super().__init__(name=name, bodypart_type=BodyPartTypes.ARM, hp=10, max_damage_lethal=False, attacks=True)
+        super().__init__(name=name, bodypart_type=BodyPartTypes.ARM, hp=random.randint(10,15), max_damage_lethal=False, attacks=True)
 
 class BT_Leg(BodyPart):
     def __init__(self, name="Leg") -> None:
-        super().__init__(name=name, bodypart_type=BodyPartTypes.LEG, hp=20, max_damage_lethal=False, attacks=True)
+        super().__init__(name=name, bodypart_type=BodyPartTypes.LEG, hp=random.randint(20,30), max_damage_lethal=False, attacks=True)
 
 body_template_humanoid = {
     "head": BT_Head(),
