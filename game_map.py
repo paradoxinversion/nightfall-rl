@@ -55,11 +55,18 @@ class GameMap:
                 return entity
 
         return None
+
+    def get_evil_characters(self):
+        living_evil_npcs = []
+        for actor in self.actors:
+            if actor.evil == True and actor.is_alive:
+                living_evil_npcs.append(actor)
+        return living_evil_npcs
+
     def get_actor_at_location(self, x: int, y: int) -> Optional[Actor]:
         for actor in self.actors:
             if actor.x == x and actor.y == y:
                 return actor
-
         return None
 
     def in_bounds(self, x: int, y: int) -> bool:
@@ -117,10 +124,10 @@ class GameWorld:
 
         self.current_floor = current_floor
 
-    def generate_floor(self) -> None:
+    def generate_map(self) -> None:
         from procgen import generate_area_map
 
-        self.current_floor += 1
+        self.current_floor = 1
 
         self.engine.game_map = generate_area_map(
             map_width=self.map_width,
