@@ -10,10 +10,9 @@ if TYPE_CHECKING:
     from components.body import BodyPart, BodyPartTypes
 
 class Action:
-    def __init__(self, entity: Actor, ticks = 1) -> None:
+    def __init__(self, entity: Actor) -> None:
         super().__init__()
         self.entity = entity
-        self.ticks = ticks
 
     @property
     def engine(self) -> Engine:
@@ -104,6 +103,13 @@ class TakeStairsAction(Action):
             )
         else:
             raise exceptions.Impossible("There are no stairs here.")
+
+class AttackAction(Action):
+    def __init__(self, entity: Actor, target: Actor):
+        super().__init__(entity)
+        self.target = target
+    def perform(self) -> None:
+        self.entity.fighter.attack(self.target)
 
 class ActionWithDirection(Action):
     def __init__(self, entity: Actor, dx: int, dy: int, force_attack: bool):
