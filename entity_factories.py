@@ -9,11 +9,18 @@ from components.level import Level
 from components.body import Body
 from entity import Actor, Item
 from enum import Enum
-
+from components.skills import Skill
+import generators.equipment
+import random
 if TYPE_CHECKING:
    from entity import Actor
+   from engine import Engine
    
-def create_person() -> Actor:
+def create_person(
+    first_name = None,
+    last_name = None,
+    age = None
+) -> Actor:
     person = Actor(
         char="@",
         color=(255, 255, 255),
@@ -24,6 +31,21 @@ def create_person() -> Actor:
         level=Level(level_up_base=200),
         body=Body(race="human")
     )
+    person.initialize(first_name, last_name, age)
+    skills = {
+        "fighting": Skill(person, "fighting", random.randint(10,20))
+    }
+    person.skills = skills
+
+    jacket = generators.equipment.generate_jacket()
+    person.inventory.items.append(jacket)
+    jacket.parent = person
+    # person.equipment.toggle_equip(jacket)
+
+    pants = generators.equipment.generate_pants()
+    person.inventory.items.append(pants)
+    pants.parent = person
+    # person.equipment.toggle_equip(pants)
 
     return person
 
