@@ -2,9 +2,10 @@ from __future__ import annotations
 import copy
 import math
 # from entity_factories import pants
-from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union, List
+from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union, List, Dict
 from render_order import RenderOrder
 from namegen import NameGenerator
+from components.deeds import Deeds
 if TYPE_CHECKING:
     from components.ai import BaseAI
     from components.consumable import Consumable
@@ -14,6 +15,8 @@ if TYPE_CHECKING:
     from components.inventory import Inventory
     from components.level import Level
     from components.body import Body
+    from components.deeds import Deeds
+    from components.skills import Skill
     from game_map import GameMap
     from building import Building
 
@@ -60,21 +63,21 @@ class Entity:
         return self.parent.gamemap
 
     def spawn(self: T, gamemap: GameMap, x: int, y: int, spawn_items: List[Item] = []) -> T:
-       """Spawn a copy of this instance at the given location."""
-       clone = copy.deepcopy(self)
-       clone.x = x
-       clone.y = y
-       clone.parent = gamemap
-       gamemap.entities.add(clone)
-       if isinstance(self, Actor):
-            for i in spawn_items:
-                if i.equippable:
-                    equippable_item = copy.deepcopy(i)
-                    equippable_item.parent = clone.inventory
-                    clone.inventory.items.append(equippable_item)
-                    clone.equipment.toggle_equip(equippable_item)
-            clone.initialize()
-       return clone 
+        """Spawn a copy of this instance at the given location."""
+        clone = copy.deepcopy(self)
+        clone.x = x
+        clone.y = y
+        clone.parent = gamemap
+        gamemap.entities.add(clone)
+    #    if isinstance(self, Actor):
+    #         for i in spawn_items:
+    #             if i.equippable:
+    #                 equippable_item = copy.deepcopy(i)
+    #                 equippable_item.parent = clone.inventory
+    #                 clone.inventory.items.append(equippable_item)
+    #                 clone.equipment.toggle_equip(equippable_item)
+        clone.initialize()
+        return clone 
 
     def place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> None:
         """Place this entity at a new location.  Handles moving across GameMaps."""
@@ -115,7 +118,9 @@ class Actor(Entity):
         level: Level,
         body: Body,
         base_fov: int = 8,
-        evil: bool = False
+        evil: bool = False,
+        friends: list[Actor] = [],
+        player_character: bool = False
     ):
         super().__init__(
             x=x,
@@ -149,18 +154,34 @@ class Actor(Entity):
         self.level.parent = self 
         self.owned_building: Building = None
         self.evil = False
-           
+        self.player_character = player_character
+
+        self.deeds: Deeds = Deeds()
+        self.skills: Dict[str, Skill] = {}
+        self.friends = friends
+        self.alive = True
+
     @property
     def is_alive(self) -> bool:
         """Returns True as long as this actor can perform actions."""
         return bool(self.ai)
 
-    def initialize(self):
-        self.first_name: str = NameGenerator.get_first_name()
-        self.last_name: str = NameGenerator.get_last_name()
+    def initialize(self, first_name: str = None, last_name: str = None, age: int = None):
+        if not first_name:
+            self.first_name: str = NameGenerator.get_first_name()
+        else:
+            self.first_name = first_name
+        
+        if not last_name:
+            self.last_name: str = NameGenerator.get_last_name()
+        else:
+            self.last_name = last_name
         full_name = f"{self.first_name} {self.last_name}"
         self._name = full_name
-        print (f"Initialized Character - {self._name} at {self.x},{self.y}") 
+        print (f"Initialized Character - {self._name} at {self.x},{self.y}")
+
+    def set_ai(self, ai: Type[BaseAI]):
+        self.ai = ai(self)
 
 class Item(Entity):
     def __init__(
