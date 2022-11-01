@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 class Fighter(BaseComponent):
     parent: Actor
     def __init__(self, hp: int, base_defense: int, base_power: int):
-        self.max_hp = hp
-        self._hp = hp
-        self.base_defense = base_defense
-        self.base_power = base_power
-        self.previous_target = None
+        self.max_hp: int = hp
+        self._hp: int = hp
+        self.base_defense: int = base_defense
+        self.base_power: int = base_power
+        self.previous_target: Actor = None
 
     @property
     def hp(self) -> int:
@@ -56,7 +56,7 @@ class Fighter(BaseComponent):
     def die(self) -> None:
         print(f"{self.parent.name} has died")
         if self.engine.player is self.parent:
-            death_message = "You died!"
+            death_message: str = "You died!"
             death_message_color = color.player_die
         else:
             death_message = f"{self.parent.name} is dead!"
@@ -102,16 +102,16 @@ class Fighter(BaseComponent):
 
             # choose an enemy's body part
             target_part: BodyPart = random.choice(target.body.targetable_body_parts)
-            msg = f"{self.parent.name} attacks {target.name}'s {target_part.name} with {attack.name}\n"
+            msg: str = f"{self.parent.name} attacks {target.name}'s {target_part.name} with {attack.name}\n"
 
             print(msg)
             # determine hit
-            attacker_fighting = self.parent.skills.get("fighting").value
-            target_fighting = target.skills.get("fighting").value
+            attacker_fighting: float = self.parent.skills.get("fighting").value
+            target_fighting: float = target.skills.get("fighting").value
             if random.randint(0, int(attacker_fighting)) > random.randint(0, int(target_fighting)):
                 # deal damage
-                skill_damage_bonus = random.randint(0, int(attacker_fighting))
-                total_damage = attack._damage + skill_damage_bonus + self.parent.equipment.power_bonus
+                skill_damage_bonus: int = random.randint(0, int(attacker_fighting))
+                total_damage: int = attack._damage + skill_damage_bonus + self.parent.equipment.power_bonus
                 target_part.take_damage(total_damage)
                 # At this point, the target may be dead
                 self.engine.message_log.add_message(msg)
@@ -135,12 +135,12 @@ class Fighter(BaseComponent):
         if self.hp == self.max_hp:
             return 0
 
-        new_hp_value = self.hp + amount
+        new_hp_value: int = self.hp + amount
 
         if new_hp_value > self.max_hp:
             new_hp_value = self.max_hp
 
-        amount_recovered = new_hp_value - self.hp
+        amount_recovered: int = new_hp_value - self.hp
         self.hp = new_hp_value
         return amount_recovered
 
