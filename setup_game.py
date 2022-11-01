@@ -21,20 +21,24 @@ from entity_factories import create_person
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
 def new_game(
-    player_first_name,
-    player_last_name,
-    player_age
+    player_first_name: str,
+    player_last_name: str,
+    player_age: int
 ) -> Engine:
     """Return a brand new game session as an Engine instance."""
+    # Load configuration
     config = GameConfig.load_config_json()
+
+    # Set the map size for all game maps
     map_width = config["game"]["map"]["width"]
     map_height = config["game"]["map"]["height"]
 
+    # The following fields are deprecated
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
 
-    player = copy.deepcopy(entity_factories.player)
+    # Prepare time cycles
     time_cycle = TimeCycle(
         phase_ticks_dawn = config["game"]["time_cycles"]["phase_ticks_dawn"], 
         phase_ticks_daytime = config["game"]["time_cycles"]["phase_ticks_daytime"], 
@@ -42,8 +46,9 @@ def new_game(
         phase_ticks_nighttime = config["game"]["time_cycles"]["phase_ticks_nighttime"]
     )
 
-    engine = Engine(player=player, time_cycle=time_cycle)
-
+    # Create the engine
+    engine = Engine(time_cycle=time_cycle)
+    # Create the game world
     engine.game_world = GameWorld(
         engine=engine,
         max_rooms=max_rooms,
@@ -51,36 +56,68 @@ def new_game(
         room_max_size=room_max_size,
         map_width=map_width,
         map_height=map_height,
-        
     )
-    engine.game_world.generate_floor()
+    player = create_person(
+        first_name = player_first_name,
+        last_name = player_last_name,
+        age = player_age
+    )
+    player.player_character = True
+    engine.player = player
+    engine.game_world.generate_map()
+    player.parent = engine.game_map
     engine.update_fov()
 
     engine.message_log.add_message(
         "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
-    player.parent = engine.game_map
-    # dagger = copy.deepcopy(entity_factories.dagger)
     dagger = generate_weapon()
-    # leather_jacket = copy.deepcopy(entity_factories.leather_jacket)
-    leather_jacket = generate_jacket()
-    # pants = copy.deepcopy(entity_factories.pants)
-    pants = copy.deepcopy(generate_pants())
-
-
     dagger.parent = player.inventory
-    leather_jacket.parent = player.inventory
-    pants.parent = player.inventory
 
-    player.inventory.items.append(pants)
-    player.equipment.toggle_equip_bp(pants, add_message=False)
+    # leather_jacket = generate_jacket()
+    # leather_jacket.parent = player.inventory
+
+    # pants = generate_pants()
+    # pants.parent = player.inventory
+
+    # player.inventory.items.append(pants)
+    # player.equipment.toggle_equip_bp(pants, add_message=False)
 
     player.inventory.items.append(dagger)
     player.equipment.toggle_equip_bp(dagger, add_message=False)
 
-    player.inventory.items.append(leather_jacket)
-    player.equipment.toggle_equip_bp(leather_jacket, add_message=False)
+    # player.inventory.items.append(leather_jacket)
+    # player.equipment.toggle_equip_bp(leather_jacket, add_message=False)
+    # info dump
+    info_lines = []
+    info_lines.append(f"Player\n")
+    info_lines.append(f"\t{player.name}\n")
+    info_lines.append(f"NPCs\n")
+    for npc in engine.game_map.actors:
+        info_lines.append(f"\t{npc.name}\n")
+        info_lines.append(f"\t\tEvil: {npc.evil}\n")
+        info_lines.append(f"\t\tFriends\n")
+        for friend in npc.friends:
+            info_lines.append(f"\t\t\t{friend.name}\n")
 
+        info_lines.append(f"\t\tFighter Component\n")
+        info_lines.append(f"\t\t\tMax HP: {npc.fighter.max_hp}\n")
+        info_lines.append(f"\t\t\tBase Defense: {npc.fighter.base_defense}\n")
+        info_lines.append(f"\t\t\tBase Power:{npc.fighter.base_power}\n")
+        
+        info_lines.append(f"\t\tBody Component\n")
+        for k, v in npc.body.body_parts.items():
+            info_lines.append(f"\t\t\t{k}: {v.name}\n")
+            info_lines.append(f"\t\t\t\tMax HP: {v.max_hp}\n")
+        info_lines.append(f"\t\tInventory\n")
+        for inventory_item in npc.inventory.items:
+            info_lines.append(f"\t\t\t{inventory_item.name}\n")
+        info_lines.append(f"\t\tSkills\n")
+        for skill, skill_value in npc.skills.items():
+            info_lines.append(f"\t\t\t{skill}: {skill_value.value}\n")
+
+    with open("world.txt", "w") as world_file:
+        world_file.writelines(info_lines)
     return engine
 
 def load_game(filename: str) -> Engine:
@@ -147,10 +184,8 @@ class MainMenu(input_handlers.BaseEventHandler):
 
 class CharacterCreationMenu(input_handlers.BaseEventHandler):
     """A handler for the main menu, covering rendering and input."""
-    def __init__(self) -> None:
+    def __init__(self,) -> None:
         super().__init__()
-        self.player_character =  create_person()
-        self.player_character.initialize()
         self.player_gender_options = ["male", "female", "nonbinary", "bigender"]
         self.player_gender = random.choice(self.player_gender_options)
         self.player_age = random.choice(range(18,50))
@@ -199,7 +234,7 @@ class CharacterCreationMenu(input_handlers.BaseEventHandler):
             y=y_cursor,
             width=console.width - 1,
             height=console.height,
-            string=f"Your name is {self.player_character.name}"
+            string=f"Your name is {self.player_first_name} {self.player_last_name}"
         )
 
         y_cursor = y_cursor + name_prompt_height + 2
@@ -233,11 +268,9 @@ class CharacterCreationMenu(input_handlers.BaseEventHandler):
                     player_last_name=self.player_first_name, 
                     player_age=self.player_age
                     ))
-            except FileNotFoundError:
-                return input_handlers.PopupMessage(self, "No saved game to load.")
             except Exception as exc:
                 traceback.print_exc()  # Print to stderr.
-                return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
+                return input_handlers.PopupMessage(self, f"Error:\n{exc}")
         elif event.sym == tcod.event.K_a:
             return input_handlers.MainGameEventHandler(new_game())
 
