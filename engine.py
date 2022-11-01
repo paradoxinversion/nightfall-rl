@@ -19,10 +19,10 @@ class Engine:
     game_world: GameWorld
     time_cycle: TimeCycle
 
-    def __init__(self, player: Actor, time_cycle: TimeCycle):
+    def __init__(self, time_cycle: TimeCycle):
         self.message_log = MessageLog()
         self.mouse_location = (0, 0)
-        self.player = player
+        self.player = None
         self.time_cycle = time_cycle
         self.current_fov_radius = 4
 
