@@ -11,6 +11,7 @@ from entity import Actor
 from building import Building, BuildingType
 from generators.equipment import generate_pants
 from plot import Plot
+from components.ai import EvilNPC
 if TYPE_CHECKING:
    from engine import Engine
    from entity import Entity, Actor
@@ -222,6 +223,15 @@ def place_actors(area: Area) -> List[Actor]:
             actor: Actor = entity_factories.create_person().spawn(area._game_map, x, y, [generate_pants()])
             actor.owned_building = building
             actors.append(actor)
+    for actor in actors:
+        potential_friends: list[Actor] = []
+        for friend_amt in range(3):
+            potential_friend = random.choice(actors)
+            if potential_friend != actor:
+                potential_friends.append(potential_friend)
+        print(f"{potential_friends}")
+        actor.friends = potential_friends
+
     return actors
 
 def place_entities_area(area_map: GameMap) -> None:
@@ -363,10 +373,9 @@ def generate_area_map(
    map_width: int,
    map_height: int,
    engine: Engine,
-#    max_buildings: int
 ) -> GameMap:
     """Generate a new area map."""
-    player = engine.player
+    player: Actor = engine.player
 
     area_map = GameMap(engine, map_width, map_height, entities=[player])
     new_area = Area(map_width, map_height, area_map)
@@ -466,5 +475,7 @@ def generate_area_map(
     evil_actor = random.choice(actors)
     evil_actor.color = (255, 0, 0)
     evil_actor.evil = True
+    evil_actor.ai = EvilNPC(evil_actor)
+    evil_actor.skills["fighting"].value = evil_actor.skills.get("fighting").value*2
     print(f"{evil_actor.name} is the murderer")
     return area_map
