@@ -9,7 +9,7 @@ from game_map import GameMap
 import tile_types
 from entity import Actor
 from building import Building, BuildingType
-from generators.equipment import generate_pants
+from generators.equipment import generate_pants, generate_weapon
 from plot import Plot
 from components.ai import EvilNPC
 if TYPE_CHECKING:
@@ -477,5 +477,9 @@ def generate_area_map(
     evil_actor.evil = True
     evil_actor.ai = EvilNPC(evil_actor)
     evil_actor.skills["fighting"].value = evil_actor.skills.get("fighting").value*2
+    knife = generate_weapon()
+    evil_actor.inventory.add(knife)
+    evil_actor.equipment.equip(knife, True)
+
     print(f"{evil_actor.name} is the murderer")
     return area_map
