@@ -178,6 +178,9 @@ class Actor(Entity):
             self.last_name = last_name
         full_name = f"{self.first_name} {self.last_name}"
         self._name = full_name
+        
+        self.fighter.max_hp = self.body.total_hp
+        self.fighter.hp = self.body.total_hp
         print (f"Initialized Character - {self._name} at {self.x},{self.y}")
 
     def set_ai(self, ai: Type[BaseAI]):
