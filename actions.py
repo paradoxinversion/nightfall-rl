@@ -2,12 +2,9 @@ from __future__ import annotations
 from typing import Optional, Tuple, List, TYPE_CHECKING
 import color
 import exceptions
-import random
-from combat import Attack, attackTypes
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Actor, Entity, Item
-    from components.body import BodyPart, BodyPartTypes
 
 class Action:
     def __init__(self, entity: Actor) -> None:
@@ -109,7 +106,7 @@ class AttackAction(Action):
         super().__init__(entity)
         self.target = target
     def perform(self) -> None:
-        self.entity.fighter.attack(self.target)
+        self.entity.fighter.simple_attack(self.target)
 
 class ActionWithDirection(Action):
     def __init__(self, entity: Actor, dx: int, dy: int, force_attack: bool):
@@ -137,7 +134,7 @@ class ActionWithDirection(Action):
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
         target = self.target_actor
-        self.entity.fighter.attack(target)
+        self.entity.fighter.simple_attack(target)
 
 
 class MovementAction(ActionWithDirection):
