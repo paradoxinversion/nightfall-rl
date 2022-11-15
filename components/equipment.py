@@ -67,8 +67,6 @@ class Equipment(BaseComponent):
             self.equip_message(item.name)
 
     def equip(self, item: Item, add_message: bool):
-        import pdb
-        # pdb.set_trace()
         if item.equippable.equipment_type == EquipmentType.WEAPON:
             self.unequip(item, True)
             self.weapon = item
