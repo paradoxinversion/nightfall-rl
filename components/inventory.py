@@ -19,3 +19,11 @@ class Inventory(BaseComponent):
         self.items.remove(item)
         item.place(self.parent.x, self.parent.y, self.gamemap)
         self.engine.message_log.add_message(f"You dropped the {item.name}.")
+    
+    def add(self, item: Item) -> None:
+        """
+        Adds an item to the inventory
+        """
+        self.items.append(item)
+        item.parent = self
+        item.name = self.parent.name + " " + item.name
