@@ -43,7 +43,7 @@ def generate_weapon():
     generated_equippable=Equippable(
         equippable_type=EquippableType.HELD_OBJECT,
         equipment_type=EquipmentType.WEAPON,
-        power_bonus=2,
+        power_bonus=15,
         body_slots=[BodyPartTypes.ARM]
     )
     weapon = Item(
