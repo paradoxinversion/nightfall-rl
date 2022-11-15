@@ -71,8 +71,10 @@ def new_game(
     engine.message_log.add_message(
         "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
+
     dagger = generate_weapon()
-    dagger.parent = player.inventory
+    player.inventory.add(dagger)
+    # dagger.parent = player.inventory
 
     # leather_jacket = generate_jacket()
     # leather_jacket.parent = player.inventory
@@ -83,8 +85,8 @@ def new_game(
     # player.inventory.items.append(pants)
     # player.equipment.toggle_equip_bp(pants, add_message=False)
 
-    player.inventory.items.append(dagger)
-    player.equipment.toggle_equip_bp(dagger, add_message=False)
+    # player.inventory.items.append(dagger)
+    player.equipment.equip(dagger, add_message=True)
 
     # player.inventory.items.append(leather_jacket)
     # player.equipment.toggle_equip_bp(leather_jacket, add_message=False)
