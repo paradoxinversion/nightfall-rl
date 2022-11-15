@@ -80,6 +80,6 @@ class Engine:
         )
 
         render_functions.render_time_cycles(
-            console=console, x=10, y=5, engine=self
+            console=console, x=62, y=45, engine=self
         )
         
