@@ -38,14 +38,12 @@ def create_person(
     person.skills = skills
 
     jacket = generators.equipment.generate_jacket()
-    person.inventory.items.append(jacket)
-    jacket.parent = person
-    # person.equipment.toggle_equip(jacket)
+    person.inventory.add(jacket)
+    person.equipment.equip(jacket, True)
 
     pants = generators.equipment.generate_pants()
-    person.inventory.items.append(pants)
-    pants.parent = person
-    # person.equipment.toggle_equip(pants)
+    person.inventory.add(pants)
+    person.equipment.equip(pants, True)
 
     return person
 
