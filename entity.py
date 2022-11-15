@@ -69,13 +69,6 @@ class Entity:
         clone.y = y
         clone.parent = gamemap
         gamemap.entities.add(clone)
-    #    if isinstance(self, Actor):
-    #         for i in spawn_items:
-    #             if i.equippable:
-    #                 equippable_item = copy.deepcopy(i)
-    #                 equippable_item.parent = clone.inventory
-    #                 clone.inventory.items.append(equippable_item)
-    #                 clone.equipment.toggle_equip(equippable_item)
         clone.initialize()
         return clone 
 
