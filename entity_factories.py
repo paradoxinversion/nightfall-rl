@@ -8,7 +8,6 @@ from components.inventory import Inventory
 from components.level import Level
 from components.body import Body
 from entity import Actor, Item
-from enum import Enum
 from components.skills import Skill
 import generators.equipment
 import random
@@ -19,11 +18,12 @@ if TYPE_CHECKING:
 def create_person(
     first_name = None,
     last_name = None,
-    age = None
+    age = None,
+    color = (255, 255, 255)
 ) -> Actor:
     person = Actor(
         char="@",
-        color=(255, 255, 255),
+        color=color,
         ai_cls=NPC,
         equipment=Equipment(),
         fighter=Fighter(hp=30, base_defense=1, base_power=2),
