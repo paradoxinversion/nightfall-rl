@@ -162,3 +162,4 @@ cython_debug/
 # Saved games
 *.sav
 world.txt
+bin
