@@ -66,6 +66,28 @@ class Equipment(BaseComponent):
         if add_message:
             self.equip_message(item.name)
 
+    def equip(self, item: Item, add_message: bool):
+        import pdb
+        # pdb.set_trace()
+        if item.equippable.equipment_type == EquipmentType.WEAPON:
+            self.unequip(item, True)
+            self.weapon = item
+        elif item.equippable.equipment_type == EquipmentType.ARMOR:
+            self.unequip(item, True)
+            self.armor = item
+        
+    def unequip(self, item: Item, add_message: bool):
+        if item.equippable.equipment_type == EquipmentType.WEAPON:
+            if self.weapon is item:
+                if add_message:
+                    self.unequip_message(item.name)
+                self.weapon = None
+        elif item.equippable.equipment_type == EquipmentType.ARMOR:
+            if self.armor is item:
+                if add_message:
+                    self.unequip_message(item.name)
+                self.armor = None
+
     def equip_to_bp(self, body_part: BodyPart, item: Item, add_message: bool) -> None:
         """Equip the current item to the appropriate body slot"""
 
@@ -108,7 +130,7 @@ class Equipment(BaseComponent):
             slot = "armor"
 
         if getattr(self, slot) == equippable_item:
-            self.unequip_from_slot(slot, add_message)
+            self.equip(slot, add_message)
         else:
             self.equip_to_slot(slot, equippable_item, add_message)
 
