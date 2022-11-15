@@ -74,22 +74,7 @@ def new_game(
 
     dagger = generate_weapon()
     player.inventory.add(dagger)
-    # dagger.parent = player.inventory
-
-    # leather_jacket = generate_jacket()
-    # leather_jacket.parent = player.inventory
-
-    # pants = generate_pants()
-    # pants.parent = player.inventory
-
-    # player.inventory.items.append(pants)
-    # player.equipment.toggle_equip_bp(pants, add_message=False)
-
-    # player.inventory.items.append(dagger)
     player.equipment.equip(dagger, add_message=True)
-
-    # player.inventory.items.append(leather_jacket)
-    # player.equipment.toggle_equip_bp(leather_jacket, add_message=False)
     # info dump
     info_lines = []
     info_lines.append(f"Player\n")
