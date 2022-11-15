@@ -22,7 +22,7 @@ class Engine:
     def __init__(self, time_cycle: TimeCycle):
         self.message_log = MessageLog()
         self.mouse_location = (0, 0)
-        self.player = None
+        self.player: Actor = None
         self.time_cycle = time_cycle
         self.current_fov_radius = 4
 
@@ -70,14 +70,9 @@ class Engine:
         self.message_log.render(console=console, x=21, y=45, width=40, height=5)
         render_functions.render_bar(
             console=console,
-            current_value=self.player.body.current_hp,
-            maximum_value=self.player.body.total_hp,
+            current_value=self.player.fighter.hp,
+            maximum_value=self.player.fighter.max_hp,
             total_width=20,
-        )
-        render_functions.render_dungeon_level(
-            console=console,
-            dungeon_level=self.game_world.current_floor,
-            location=(0, 47),
         )
 
         render_functions.render_names_at_mouse_location(
