@@ -1,22 +1,21 @@
 """Handle the loading and initialization of game sessions."""
 from __future__ import annotations
-import copy
-import lzma
-import pickle
-import traceback
 from typing import Optional
-import tcod
-import color
 from engine import Engine
-import entity_factories
 from game_map import GameWorld
-import input_handlers
 from time_cycles import TimeCycle
 from namegen import NameGenerator
 from game_settings import GameConfig
-from generators.equipment import generate_pants, generate_jacket, generate_weapon
-import random
+from generators.equipment import generate_weapon
 from entity_factories import create_person
+import lzma
+import pickle
+import traceback
+import random
+import tcod
+import color
+import input_handlers
+
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
@@ -60,8 +59,12 @@ def new_game(
     player = create_person(
         first_name = player_first_name,
         last_name = player_last_name,
-        age = player_age
+        age = player_age,
+        color = [255, 87, 51]
     )
+    dagger = generate_weapon()
+    player.inventory.add(dagger)
+    player.equipment.equip(dagger, add_message=True)
     player.player_character = True
     engine.player = player
     engine.game_world.generate_map()
@@ -72,9 +75,7 @@ def new_game(
         "Welcome to Nightfall. Do your best to survive.", color.welcome_text
     )
 
-    dagger = generate_weapon()
-    player.inventory.add(dagger)
-    player.equipment.equip(dagger, add_message=True)
+    
     # info dump
     info_lines = []
     info_lines.append(f"Player\n")
