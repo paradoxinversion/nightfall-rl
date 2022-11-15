@@ -5,7 +5,7 @@ from components.base_component import BaseComponent
 from render_order import RenderOrder
 import exceptions
 import random
-from combat import Attack, attackTypes
+from combat import Attack
 import components.ai
 if TYPE_CHECKING:
     from entity import Actor
@@ -28,7 +28,7 @@ class Fighter(BaseComponent):
     @hp.setter
     def hp(self, value: int) -> None:
         self._hp = max(0, min(value, self.max_hp))
-        if self._hp == 0 and self.parent.ai:
+        if self._hp == 0 and self.parent.ai is not None:
             self.die()
 
     @property
@@ -71,6 +71,54 @@ class Fighter(BaseComponent):
         self.parent.alive = False
         # self.engine.player.level.add_xp(self.parent.level.xp_given)
 
+    def simple_attack(self, target: Actor):
+        print(f"{self.parent.name}'s attack")
+        if not self.parent.alive or not target.alive:
+            return
+        # If this in an NPC, ensure their AI is set to combatant
+        if self.parent.player_character == False and not isinstance(self.parent.ai, components.ai.Combatant):
+            previous_ai = self.parent.ai
+            self.parent.ai = components.ai.Combatant(entity=self.parent, target=target, previous_ai=previous_ai)
+            print(f"Set {self.parent.name}'s previous AI to {previous_ai}")
+        if not isinstance(target.ai, components.ai.Combatant):
+            target_previous_ai = target.ai
+            target.ai = components.ai.Combatant(entity=target, target=self.parent, previous_ai=target_previous_ai)
+            print(f"Set {target.name}'s previous AI to {target_previous_ai}")
+        
+         # Raise an expection for nothing to attack
+        if not target:
+            raise exceptions.Impossible("Nothing to attack.")
+        attacker_equipped_weapon = self.parent.equipment.weapon
+        if attacker_equipped_weapon is None:
+            attack = Attack("uarmed attack", 5)
+        else:
+            attack = Attack("weapon attack", attacker_equipped_weapon.equippable.power_bonus)
+        msg: str = f"{self.parent.name} attacks {target.name} with {attack.name}\n"
+        print(msg)
+        # determine hit
+        attacker_fighting: float = self.parent.skills.get("fighting").value
+        target_fighting: float = target.skills.get("fighting").value
+        # deal damage
+        skill_damage_bonus: int = random.randint(0, int(attacker_fighting))
+        total_damage: int = attack._damage + skill_damage_bonus + self.parent.equipment.power_bonus
+        target.fighter.take_damage(total_damage)
+        print(f"{self.parent.name} deals {total_damage} damage to {target.name}")
+        # At this point, the target may be dead
+        self.engine.message_log.add_message(msg)
+
+        # If the target is dead, 
+        if target.alive == False:
+            self.parent.deeds.characters_murdered = self.parent.deeds.characters_murdered + 1
+            if target.evil:
+                self.parent.deeds.evil_entities_slain = self.parent.deeds.evil_entities_slain + 1
+            print(f"{self.parent.name} reverting to {self.parent.ai.previous_ai}")
+            self.parent.ai = self.parent.ai.previous_ai
+        
+        self.previous_target = target
+        self.parent.skills.get("fighting").increase(0.025)
+        print(self.parent.skills.get("fighting").value)
+
+
     def attack(self, target: Actor):
         if not self.parent.alive or not target.alive:
             return
@@ -96,9 +144,13 @@ class Fighter(BaseComponent):
             self.engine.message_log.add_message(msg)
 
         else:
-            # decide which usable part is attacking
-            attacking_part: BodyPart = random.choice(usable_body_parts)
-            attack: Attack = random.choice(attackTypes.get(attacking_part.bodypart_type))
+            attacker_equipped_weapon = self.parent.equipment.weapon
+            if attacker_equipped_weapon is not None:
+                # Select a weapon attack
+                attack: Attack = random.choice(attacker_equipped_weapon.equippable.attacks)
+            else:
+                attacking_part: BodyPart = random.choice(usable_body_parts)
+                attack: Attack = random.choice(attackTypes.get(attacking_part.bodypart_type))
 
             # choose an enemy's body part
             target_part: BodyPart = random.choice(target.body.targetable_body_parts)
