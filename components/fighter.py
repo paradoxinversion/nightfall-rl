@@ -72,9 +72,10 @@ class Fighter(BaseComponent):
         # self.engine.player.level.add_xp(self.parent.level.xp_given)
 
     def simple_attack(self, target: Actor):
-        print(f"{self.parent.name}'s attack")
+        # If either this character or their target is dead, skip the attack
         if not self.parent.alive or not target.alive:
             return
+
         # If this in an NPC, ensure their AI is set to combatant
         if self.parent.player_character == False and not isinstance(self.parent.ai, components.ai.Combatant):
             previous_ai = self.parent.ai
@@ -85,29 +86,36 @@ class Fighter(BaseComponent):
             target.ai = components.ai.Combatant(entity=target, target=self.parent, previous_ai=target_previous_ai)
             print(f"Set {target.name}'s previous AI to {target_previous_ai}")
         
-         # Raise an expection for nothing to attack
+         # Raise an exception if there's no target
         if not target:
             raise exceptions.Impossible("Nothing to attack.")
+        
+        # Determine if it's an armed or unarmed attack
         attacker_equipped_weapon = self.parent.equipment.weapon
         if attacker_equipped_weapon is None:
             attack = Attack("uarmed attack", 5)
         else:
             attack = Attack("weapon attack", attacker_equipped_weapon.equippable.power_bonus)
-        msg: str = f"{self.parent.name} attacks {target.name} with {attack.name}\n"
-        print(msg)
+        
+        # Start the message 
+        msg: str = f"{self.parent.name} attacks {target.name} with {attack.name}! "
+
         # determine hit
         attacker_fighting: float = self.parent.skills.get("fighting").value
         target_fighting: float = target.skills.get("fighting").value
+        hit = True
         # deal damage
-        skill_damage_bonus: int = random.randint(0, int(attacker_fighting))
-        total_damage: int = attack._damage + skill_damage_bonus + self.parent.equipment.power_bonus
-        target.fighter.take_damage(total_damage)
-        print(f"{self.parent.name} deals {total_damage} damage to {target.name}")
+        if hit:
+            skill_damage_bonus: int = random.randint(0, int(attacker_fighting))
+            total_damage: int = attack._damage + skill_damage_bonus + self.parent.equipment.power_bonus
+            target.fighter.take_damage(total_damage)
+            msg += f"{self.parent.name} deals {total_damage} damage to {target.name}!"
         # At this point, the target may be dead
+        print(msg)
         self.engine.message_log.add_message(msg)
 
-        # If the target is dead, 
         if target.alive == False:
+            # If the attacker killed the target, add to their deeds
             self.parent.deeds.characters_murdered = self.parent.deeds.characters_murdered + 1
             if target.evil:
                 self.parent.deeds.evil_entities_slain = self.parent.deeds.evil_entities_slain + 1
@@ -116,7 +124,6 @@ class Fighter(BaseComponent):
         
         self.previous_target = target
         self.parent.skills.get("fighting").increase(0.025)
-        print(self.parent.skills.get("fighting").value)
 
 
     def attack(self, target: Actor):
@@ -178,7 +185,6 @@ class Fighter(BaseComponent):
                 
                 self.previous_target = target
                 self.parent.skills.get("fighting").increase(0.025)
-                print(self.parent.skills.get("fighting").value)
             else:
                 msg += f"{self.parent.name} missed!"
                 self.engine.message_log.add_message(msg)
