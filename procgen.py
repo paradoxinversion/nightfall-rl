@@ -229,7 +229,6 @@ def place_actors(area: Area) -> List[Actor]:
             potential_friend = random.choice(actors)
             if potential_friend != actor:
                 potential_friends.append(potential_friend)
-        print(f"{potential_friends}")
         actor.friends = potential_friends
 
     return actors
@@ -419,7 +418,7 @@ def generate_area_map(
                 width=standard_plot,
                 height=standard_plot
             )
-            print (f"Creating a new plot ({vertical_plot}/{horizontal_plot}) at ({newPlot.x}, {newPlot.y})")
+            print(f"Creating a new plot ({vertical_plot}/{horizontal_plot}) at ({newPlot.x}, {newPlot.y})")
            
             # Fill in the plot with grass tiles
             # Mostly for debug purposes
