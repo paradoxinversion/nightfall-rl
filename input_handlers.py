@@ -247,7 +247,6 @@ class ContextClickHandler(SelectIndexHandler):
 
     def on_index_selected(self, x: int, y: int) -> Optional[ActionOrHandler]:
         # return super().on_index_selected(x, y)
-        print(x, y)
         actor = self.engine.game_map.get_actor_at_location(x, y)
         if actor:
             return ConversationHandler(self.engine, actor)
@@ -259,7 +258,6 @@ class LookHandler(SelectIndexHandler):
 
     def on_index_selected(self, x: int, y: int) -> MainGameEventHandler:
         """Return to main handler."""
-        print('t')
         return MainGameEventHandler(self.engine)
 
 class SingleRangedAttackHandler(SelectIndexHandler):
