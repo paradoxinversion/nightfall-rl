@@ -369,7 +369,7 @@ class EndgameEventHandler(EventHandler):
         console.print(1, 1, "Endgame")
         x = 0
         y = 0
-        width = int(config["game"]["map"]["width"] / 2)
+        width = int(config["game"]["map"]["width"])
         height = 30
 
         console.draw_frame(
@@ -389,11 +389,10 @@ class EndgameEventHandler(EventHandler):
         if self.engine.player.deeds.evil_entities_slain == 0:
             end_string += "You did nothing to prevent the harm of despicable foes."
         console.print_rect(
-            x=2,
+            x=1,
             y=2,
-            width=width-x,
+            width=width-x -2,
             height=height-y,
-            # string=f"The world has been made safe. You've slain {self.engine.player.deeds.evil_entities_slain} evil entities. You've snuffed out {self.engine.player.deeds.characters_murdered} lives."
             string=end_string
         )
     def on_quit(self) -> None:
