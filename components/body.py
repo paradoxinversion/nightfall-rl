@@ -32,7 +32,8 @@ class BodyPart():
         self._attacks = attacks
         self.worn_article = None
         self.held_object = None
-        self.energy = energy
+        self._energy = energy
+        self._hunger = 0
 
     @property
     def name(self) -> str:
@@ -99,7 +100,7 @@ class BodyPart():
         if (self._hp > 0):
             return True
         return False
-
+    
 class BT_Head(BodyPart):
     def __init__(self, name="Head") -> None:
         super().__init__(name=name, bodypart_type=BodyPartTypes.HEAD, hp=random.randint(20,30), max_damage_lethal=True, attacks=False)
@@ -128,14 +129,27 @@ class Body(BaseComponent):
     """A body def for a coporeal or incorporeal entity """
     parent: Actor
     def __init__(self, race="human"):
+        self._energy = 100
+        self._max_energy = 100
+        self._hunger = 0
+        self.max_hunger = 100
         if (race == "human"):
             body_template = deepcopy(body_template_humanoid)
         else:
             body_template = deepcopy(body_template_humanoid) # The default body template is humanoid
         self.body_parts: dict[str, BodyPart] = body_template
+        print(self.body_parts)
         for part in body_template.values():
             part.parent = self
+    @property
+    def energy(self):
+        """The amount of ticks a character can be awake before they pass out"""
+        return self._energy
     
+    @property
+    def hunger(self):
+        """How hungry the character is. Increments in ticks."""
+        return self._hunger
     @property
     def total_hp(self):
         total_hp = 0
