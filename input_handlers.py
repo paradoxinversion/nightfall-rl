@@ -325,9 +325,11 @@ class MainGameEventHandler(EventHandler):
             if event.mod & (tcod.event.KMOD_LSHIFT | tcod.event.KMOD_RSHIFT):
                 force_attack = True
             action = BumpAction(entity=player, dx=dx, dy=dy, force_attack=force_attack)
-            self.engine.time_cycle.tick()
+            player.body._hunger = player.body.hunger + 1
+            self.engine.time_cycle.tick(self.engine)
         elif key in WAIT_KEYS:
             action = WaitAction(player)
+            self.engine.time_cycle.tick(self.engine)
 
         elif key == tcod.event.K_ESCAPE:
             raise SystemExit()
