@@ -6,8 +6,17 @@ Each turn of the game is (currently) the shortest unit of time: a tick. A day in
 
 As mentioned, each action currently takes one tick, whether it's using an item, attacking, waiting, moving, etc. Each action should take at least one tick, with more arduous ones (such as trying to force something open) taking more ticks than simple ones (taking a step).
 
+Actions
+Actions take one tick and represent what a character is doing moment to moment, such as moving or attacking.
+
+Activities
+Activities are actions that take multiple ticks, such as going somewhere, crafting something, etc.
+
 NPCs and Time
 At various times of the day, (most) NPCs will often go somewhere or do something. Before night time, citizens with homes will go home.
+
+Evil NPCs
+Evil NPCs have a cooldown time before their next atrocity. It is separated by day(s).
 
 Related Docs
 scripts/time_cycle.md

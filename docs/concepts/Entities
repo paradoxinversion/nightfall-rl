@@ -1,0 +1,4 @@
+Entities represent characters, items, and objects in the game. Entities have various subclasses
+
+Actors
+Actors are entities that act independently in the game. They take some action each tick of the game.
