@@ -9,10 +9,11 @@ import exceptions
 from message_log import MessageLog
 from time_cycles import TimeCycle, NIGHT_FOV_RANGE
 import render_functions
-
+from components.ai import EvilNPC
 if TYPE_CHECKING:
     from entity import Actor
     from game_map import GameMap, GameWorld
+    from components.ai import EvilNPC
 
 class Engine:
     game_map: GameMap
@@ -34,9 +35,22 @@ class Engine:
 
     def handle_enemy_turns(self) -> None:
         for entity in set(self.game_map.actors) - {self.player}:
+            hunger = entity.body._hunger
+            entity.body._hunger = hunger + 1
             if entity.ai:
+                # check hunger levels
+                hungry = False
+                if entity.body.hunger >= entity.body.max_hunger:
+                    hungry = True
+                    if hungry:
+                        for bp in entity.body.body_parts:
+                            bp
                 try:
                     entity.ai.perform()
+                    if isinstance(entity.ai, EvilNPC):
+                        if self.game_map.engine.time_cycle.tick_day == 0:
+                            entity.ai.murder_cooldown = entity.ai.murder_cooldown -1
+                            print(f"MC is {entity.ai.murder_cooldown}")
                 except exceptions.Impossible:
                     pass  # Ignore impossible action exceptions from AI.
 
@@ -68,13 +82,30 @@ class Engine:
     def render(self, console: Console) -> None:
         self.game_map.render(console)
         self.message_log.render(console=console, x=21, y=45, width=40, height=5)
+        # render_functions.render_bar(
+        #     console=console,
+        #     current_value=self.player.fighter.hp,
+        #     maximum_value=self.player.fighter.max_hp,
+        #     total_width=20,
+        # )
         render_functions.render_bar(
             console=console,
+            x=0,
+            y=45,
+            text="HP",
             current_value=self.player.fighter.hp,
             maximum_value=self.player.fighter.max_hp,
             total_width=20,
         )
-
+        render_functions.render_bar(
+            console=console,
+            x=0,
+            y=46,
+            text="Hunger",
+            current_value=self.player.body.hunger,
+            maximum_value=self.player.body.max_hunger,
+            total_width=20,
+        )
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=44, engine=self
         )
