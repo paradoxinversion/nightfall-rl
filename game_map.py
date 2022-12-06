@@ -56,7 +56,7 @@ class GameMap:
 
         return None
 
-    def get_evil_characters(self):
+    def get_evil_characters(self) -> List[Actor]:
         living_evil_npcs = []
         for actor in self.actors:
             if actor.evil == True and actor.is_alive:
