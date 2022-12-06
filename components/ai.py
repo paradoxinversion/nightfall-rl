@@ -218,10 +218,8 @@ class EvilNPC(NPC):
         self.murder_cooldown = 0
         self.current_target = None
     def seek_victim(self):
-        # if (self.murder_cooldown > 0):
-        #     self.wander()
         # select a victim
-        if self.current_target == None:
+        if self.current_target == None and self.murder_cooldown == 0:
             possible_victims = []
             for actor in self.engine.game_map.actors:
                 if actor is not self.entity and actor.is_alive and actor.player_character == False and actor not in self.entity.friends:
@@ -229,23 +227,27 @@ class EvilNPC(NPC):
             victim = random.choice(list(possible_victims))
             self.current_target = victim
             print(f"{self.entity.name} is hunting {self.current_target.name}")
+
         # pathfind to that victim
-        x = self.current_target.x
-        y = self.current_target.y
-        self.path = self.go_to_location(x, y)
-        dx = x - self.entity.x
-        dy = y - self.entity.y
-        distance = max(abs(dx), abs(dy))
-        if distance <= 1:
-        # attack victim
-            AttackAction(self.entity, self.current_target).perform()
-            if not self.current_target.alive:
-                print("Setting murder cooldown to 3")
-                self.murder_cooldown = 3 # wait three days for the next murder
-                self.current_target = None 
+        if self.current_target:
+            x = self.current_target.x
+            y = self.current_target.y
+            self.path = self.go_to_location(x, y)
+            dx = x - self.entity.x
+            dy = y - self.entity.y
+            distance = max(abs(dx), abs(dy))
+            if distance <= 1:
+            # attack victim
+                AttackAction(self.entity, self.current_target).perform()
+                if not self.current_target.alive:
+                    print("Setting murder cooldown to 3")
+                    self.murder_cooldown = 3 # wait three days for the next murder
+                    self.current_target = None 
+        else:
+            self.wander()
+            
 
     def perform(self) -> None:
-        # NPCs wander by default, unless they are going home or home for the night
         self.seek_victim()
         
             
